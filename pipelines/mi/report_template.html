@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{ installer_name }} — Michigan Solar Installer Report</title>
+<style>
+    @page {
+        size: letter;
+        margin: 0.75in 0.85in;
+        @bottom-center {
+            content: "Generated from public Michigan LARA (Bureau of Construction Codes) license records. Not affiliated with or endorsed by LARA.";
+            font-size: 7.5pt;
+            color: #8a8a8a;
+            font-family: "Helvetica Neue", Arial, sans-serif;
+        }
+    }
+    body {
+        font-family: "Helvetica Neue", Arial, sans-serif;
+        color: #1f2430;
+        font-size: 10.5pt;
+        line-height: 1.5;
+    }
+    .header {
+        border-bottom: 3px solid #1f2430;
+        padding-bottom: 8px;
+        margin-bottom: 10px;
+    }
+    .eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 8pt;
+        color: #6b7280;
+        font-weight: 600;
+    }
+    h1 {
+        font-size: 22pt;
+        margin: 4px 0 2px 0;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 4px 14px;
+        border-radius: 3px;
+        font-weight: 700;
+        font-size: 10pt;
+        letter-spacing: 0.03em;
+        margin-top: 6px;
+    }
+    .status-current { background: #e6f4ea; color: #1e7e34; border: 1px solid #1e7e34; }
+    .status-none-current { background: #fdecea; color: #a11d1d; border: 1px solid #a11d1d; }
+
+    .match-note {
+        background: #eef0f3;
+        border: 1px solid #cbd2d9;
+        border-radius: 3px;
+        padding: 8px 14px;
+        font-size: 8.5pt;
+        color: #4b5563;
+        margin: 10px 0 14px 0;
+    }
+
+    .section-title {
+        font-size: 12pt;
+        font-weight: 700;
+        margin: 14px 0 6px 0;
+        padding-bottom: 3px;
+        border-bottom: 1px solid #d1d5db;
+    }
+
+    .license-card {
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        padding: 8px 16px;
+        margin-bottom: 7px;
+    }
+    .license-card .license-type {
+        font-weight: 700;
+        font-size: 10.5pt;
+        margin-bottom: 3px;
+    }
+    .license-fields {
+        display: flex;
+        gap: 24px;
+    }
+    .license-fields .col { flex: 1; }
+    .field-label {
+        font-size: 7.5pt;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #6b7280;
+        margin-bottom: 0px;
+    }
+    .field-value {
+        font-size: 10pt;
+        margin-bottom: 4px;
+        font-weight: 500;
+    }
+    .license-status-current { color: #1e7e34; font-weight: 700; }
+    .license-status-lapsed { color: #a11d1d; font-weight: 700; }
+    .classifications-note {
+        font-size: 9.5pt;
+        color: #4b5563;
+        margin-top: 4px;
+    }
+
+    .not-sourced-box {
+        background: #fff4e0;
+        border: 1px solid #f0d59a;
+        border-left: 5px solid #a15c00;
+        border-radius: 3px;
+        padding: 8px 16px;
+        margin: 6px 0;
+        font-size: 9pt;
+        color: #6b4a00;
+    }
+    .not-sourced-box .flag-title {
+        font-weight: 700;
+        margin-bottom: 2px;
+    }
+
+    .source-note {
+        margin-top: 14px;
+        padding-top: 8px;
+        border-top: 1px solid #d1d5db;
+        font-size: 7.8pt;
+        color: #6b7280;
+    }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <div class="eyebrow">Michigan Solar Installer Verification</div>
+    <h1>{{ installer_name }}</h1>
+    {% if any_current %}
+    <span class="status-badge status-current">At least one current license</span>
+    {% else %}
+    <span class="status-badge status-none-current">No current license found</span>
+    {% endif %}
+</div>
+
+<div class="match-note">
+    <strong>How this business was identified:</strong> matched to Michigan LARA license
+    records by business name (confidence: {{ weakest_confidence }}). This is a name-matching
+    process, not a direct lookup by a single ID the way a license-number search would be —
+    if this doesn't look like the right business, the license records below may belong to a
+    different, similarly-named company.
+</div>
+
+<div class="section-title">Licenses on File with LARA</div>
+{% for lic in licenses %}
+<div class="license-card">
+    <div class="license-type">{{ lic.license_type }}</div>
+    <div class="license-fields">
+        <div class="col">
+            <div class="field-label">License Number</div>
+            <div class="field-value">{{ lic.license_number }}</div>
+            <div class="field-label">Status</div>
+            <div class="field-value {% if lic.is_current %}license-status-current{% else %}license-status-lapsed{% endif %}">
+                {{ lic.status }}
+            </div>
+        </div>
+        <div class="col">
+            <div class="field-label">Expiration Date</div>
+            <div class="field-value">{{ lic.expiration_date }}</div>
+            {% if lic.classifications %}
+            <div class="field-label">Classifications</div>
+            <div class="field-value">{{ lic.classifications | join(", ") }}</div>
+            {% endif %}
+        </div>
+    </div>
+    {% if "M and A" in lic.license_type and not lic.classifications %}
+    <div class="classifications-note">No trade classifications found on file for this license.</div>
+    {% endif %}
+</div>
+{% endfor %}
+
+<div class="section-title">Disciplinary Actions &amp; Complaints</div>
+<div class="not-sourced-box">
+    <div class="flag-title">Not yet available for Michigan</div>
+    This directory has not yet built a disciplinary-action, BBB complaint, or bankruptcy-filing
+    data source for Michigan installers (unlike some other states in this directory, where that
+    data has been collected). The absence of flags here means this hasn't been checked yet —
+    it is not a claim that this business has a clean record.
+</div>
+
+<div class="source-note">
+    License data sourced from the Michigan Department of Licensing and Regulatory Affairs (LARA),
+    Bureau of Construction Codes, via the public Accela Citizen Access license search
+    (aca-prod.accela.com/LARA), retrieved {{ generated_date }}. Michigan has no dedicated solar
+    installer license classification — this business is matched by name across the Residential
+    Builder, Residential Builder M&amp;A, and Electrical Contractor license types, any of which
+    solar work may legally require. This report reflects what LARA has published as of the
+    retrieval date and is not a substitute for confirming status directly with LARA's Bureau of
+    Construction Codes before hiring.
+</div>
+
+</body>
+</html>
