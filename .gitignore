@@ -8,3 +8,5 @@ pipelines/az/examples/
 pipelines/mi/raw/
 pipelines/mi/candidates_mi.csv
 pipelines/mi/matches_mi.csv
+pipelines/mi/enriched_mi_test.csv
+pipelines/mi/enriched_mi.csv
