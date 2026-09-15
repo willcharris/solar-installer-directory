@@ -1,0 +1,6 @@
+*.db
+data/*/raw/
+scraper/exports/
+scraper/candidates/
+texas/exports/
+fl_scoping/fl_solar_out/
