@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{ business_name }} — Arizona Solar Installer Report</title>
+<style>
+    @page {
+        size: letter;
+        margin: 0.75in 0.85in;
+        @bottom-center {
+            content: "Generated from public Arizona Registrar of Contractors records. Not affiliated with or endorsed by AZ ROC.";
+            font-size: 7.5pt;
+            color: #8a8a8a;
+            font-family: "Helvetica Neue", Arial, sans-serif;
+        }
+    }
+    body {
+        font-family: "Helvetica Neue", Arial, sans-serif;
+        color: #1f2430;
+        font-size: 10.5pt;
+        line-height: 1.5;
+    }
+    .header {
+        border-bottom: 3px solid #1f2430;
+        padding-bottom: 14px;
+        margin-bottom: 18px;
+    }
+    .eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 8pt;
+        color: #6b7280;
+        font-weight: 600;
+    }
+    h1 {
+        font-size: 22pt;
+        margin: 4px 0 2px 0;
+    }
+    .dba {
+        font-size: 11pt;
+        color: #4b5563;
+        font-style: italic;
+        margin-bottom: 4px;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 4px 14px;
+        border-radius: 3px;
+        font-weight: 700;
+        font-size: 10pt;
+        letter-spacing: 0.03em;
+        margin-top: 6px;
+    }
+    .status-active { background: #e6f4ea; color: #1e7e34; border: 1px solid #1e7e34; }
+    .status-revoked { background: #fdecea; color: #a11d1d; border: 1px solid #a11d1d; }
+    .status-suspended { background: #fff4e0; color: #a15c00; border: 1px solid #a15c00; }
+    .status-unknown { background: #eef0f3; color: #4b5563; border: 1px solid #9ca3af; }
+
+    .grid {
+        display: flex;
+        gap: 24px;
+        margin: 22px 0;
+    }
+    .col {
+        flex: 1;
+    }
+    .field-label {
+        font-size: 8pt;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #6b7280;
+        margin-bottom: 1px;
+    }
+    .field-value {
+        font-size: 11pt;
+        margin-bottom: 12px;
+        font-weight: 500;
+    }
+
+    .section-title {
+        font-size: 13pt;
+        font-weight: 700;
+        margin: 22px 0 8px 0;
+        padding-bottom: 4px;
+        border-bottom: 1px solid #d1d5db;
+    }
+
+    .flag-box {
+        background: #fdecea;
+        border: 1px solid #f3b6b0;
+        border-left: 5px solid #a11d1d;
+        border-radius: 3px;
+        padding: 12px 16px;
+        margin: 10px 0;
+    }
+    .flag-box .flag-title {
+        font-weight: 700;
+        color: #a11d1d;
+        font-size: 10.5pt;
+        margin-bottom: 4px;
+    }
+    .flag-box .flag-meta {
+        font-size: 9pt;
+        color: #6b3b3b;
+    }
+
+    .clean-box {
+        background: #e6f4ea;
+        border: 1px solid #b6ddc0;
+        border-left: 5px solid #1e7e34;
+        border-radius: 3px;
+        padding: 12px 16px;
+        margin: 10px 0;
+        font-size: 10pt;
+        color: #285e38;
+    }
+
+    .not-in-roster-note {
+        background: #eef0f3;
+        border: 1px solid #cbd2d9;
+        border-radius: 3px;
+        padding: 10px 14px;
+        font-size: 9pt;
+        color: #4b5563;
+        margin-bottom: 16px;
+    }
+
+    .source-note {
+        margin-top: 26px;
+        padding-top: 10px;
+        border-top: 1px solid #d1d5db;
+        font-size: 8.5pt;
+        color: #6b7280;
+    }
+    .source-note a { color: #4b5563; }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <div class="eyebrow">Arizona Solar Installer Verification</div>
+    <h1>{{ business_name }}</h1>
+    {% if dba %}<div class="dba">Doing business as: {{ dba }}</div>{% endif %}
+    <span class="status-badge status-{{ status_class }}">{{ status_label }}</span>
+</div>
+
+{% if not_in_active_roster %}
+<div class="not-in-roster-note">
+    <strong>Note:</strong> This license does not appear in AZ ROC's current active-contractor roster
+    (checked as of {{ snapshot_date }}). It is included here because it has a public disciplinary
+    history on file. Absence from the active roster typically means the license expired, was not
+    renewed, or was revoked/suspended — see below for what's known.
+</div>
+{% endif %}
+
+<div class="grid">
+    <div class="col">
+        <div class="field-label">License Number</div>
+        <div class="field-value">{{ license_no }}</div>
+        <div class="field-label">Classification</div>
+        <div class="field-value">{{ class_detail }}</div>
+        <div class="field-label">City</div>
+        <div class="field-value">{{ city }}{% if city and state %}, {{ state }}{% endif %}</div>
+    </div>
+    <div class="col">
+        <div class="field-label">Issued</div>
+        <div class="field-value">{{ issued_date or "Not available" }}</div>
+        <div class="field-label">Expiration</div>
+        <div class="field-value">{{ expiration_date or "Not available" }}</div>
+        <div class="field-label">Qualifying Party</div>
+        <div class="field-value">{{ qualifying_party or "Not listed" }}</div>
+    </div>
+</div>
+
+<div class="section-title">Disciplinary History</div>
+{% if disciplinary_records %}
+    {% for rec in disciplinary_records %}
+    <div class="flag-box">
+        <div class="flag-title">{{ rec.description }} — Case {{ rec.case_number }}</div>
+        <div class="flag-meta">License class at time of action: {{ rec.license_class }} &middot; On file as of ROC snapshot {{ rec.first_seen_snapshot }}</div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="clean-box">No disciplinary actions on file with AZ ROC as of {{ snapshot_date }}.</div>
+{% endif %}
+
+<div class="source-note">
+    Data sourced from the Arizona Registrar of Contractors public posting list
+    (roc.az.gov/posting-list), snapshot dated {{ snapshot_date }}. This report reflects
+    what ROC has published as of that date and is not a substitute for contacting ROC
+    directly at (602) 542-1525 to confirm current status before hiring.
+</div>
+
+</body>
+</html>
