@@ -97,7 +97,7 @@ def is_solar_relevant(class_detail: str, business_name: str, dba: str) -> bool:
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS licenses (
-    license_no TEXT NOT NULL,
+    license_no TEXT PRIMARY KEY,
     class_code TEXT NOT NULL,
     business_name TEXT,
     dba TEXT,
@@ -113,9 +113,14 @@ CREATE TABLE IF NOT EXISTS licenses (
     status TEXT,
     is_solar_relevant INTEGER NOT NULL DEFAULT 0,
     first_seen_snapshot TEXT,
-    last_seen_snapshot TEXT,
-    PRIMARY KEY (license_no, class_code)
+    last_seen_snapshot TEXT
 );
+-- Note: confirmed against the 2026-09-14 snapshot that every AZ license_no
+-- carries exactly one classification (58,147 rows, 58,147 distinct license
+-- numbers) -- unlike CA, where one license can hold several classifications
+-- via a separate join table. If a future AZ snapshot ever shows a license_no
+-- with more than one class_code, this assumption is broken and the table
+-- needs CA's license_classifications join-table pattern instead.
 
 CREATE TABLE IF NOT EXISTS status_changes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -203,7 +208,7 @@ def ingest_roster(conn, path: Path):
         "SELECT license_no, class_code, business_name, status, last_seen_snapshot "
         "FROM licenses WHERE status = 'Active'"
     )
-    previously_active = {(r[0], r[1]): r for r in cur.fetchall()}
+    previously_active = {r[0]: r for r in cur.fetchall()}
 
     seen_this_snapshot = set()
     for row in rows:
@@ -213,12 +218,11 @@ def ingest_roster(conn, path: Path):
         dba = row.get("Doing Business As", "").strip()
         class_detail = row.get("Class Detail", "").strip()
         solar = int(is_solar_relevant(class_detail, business_name, dba))
-        key = (license_no, class_code)
-        seen_this_snapshot.add(key)
+        seen_this_snapshot.add(license_no)
 
         cur.execute(
-            "SELECT first_seen_snapshot FROM licenses WHERE license_no=? AND class_code=?",
-            (license_no, class_code),
+            "SELECT first_seen_snapshot FROM licenses WHERE license_no=?",
+            (license_no,),
         )
         existing = cur.fetchone()
         first_seen = existing[0] if existing else snap
@@ -230,7 +234,7 @@ def ingest_roster(conn, path: Path):
                 qualifying_party, issued_date, expiration_date, status,
                 is_solar_relevant, first_seen_snapshot, last_seen_snapshot)
             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-            ON CONFLICT(license_no, class_code) DO UPDATE SET
+            ON CONFLICT(license_no) DO UPDATE SET
                 business_name=excluded.business_name,
                 dba=excluded.dba,
                 class_detail=excluded.class_detail,
@@ -259,9 +263,8 @@ def ingest_roster(conn, path: Path):
     # Anything that was Active before but isn't in this snapshot at all has
     # dropped off ROC's active list -- log it rather than silently losing it.
     dropped = set(previously_active) - seen_this_snapshot
-    for key in dropped:
-        license_no, class_code = key
-        _, _, business_name, last_status, last_seen = previously_active[key]
+    for license_no in dropped:
+        _, class_code, business_name, last_status, last_seen = previously_active[license_no]
         cur.execute(
             """
             INSERT INTO status_changes
