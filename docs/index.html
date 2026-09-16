@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Solar Installer Check — verify a solar contractor's license</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --ink: #1f2430;
+        --ink-soft: #4b5563;
+        --paper: #f7f6f3;
+        --paper-panel: #ffffff;
+        --line: #d9d5cd;
+        --accent: #2563a8;
+        --accent-soft: #eaf2fb;
+        --green: #1e7e34;
+        --green-soft: #e6f4ea;
+        --red: #a11d1d;
+        --red-soft: #fdecea;
+        --amber: #a15c00;
+        --amber-soft: #fff4e0;
+        --serif: "Source Serif 4", Georgia, serif;
+        --sans: "Public Sans", -apple-system, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+        margin: 0;
+        font-family: var(--sans);
+        color: var(--ink);
+        background: var(--paper);
+        line-height: 1.55;
+    }
+    a { color: var(--accent); }
+    a:focus-visible, button:focus-visible, input:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 2px;
+    }
+
+    .site-header {
+        border-bottom: 1px solid var(--line);
+        background: var(--paper-panel);
+    }
+    .site-header-inner {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 18px 24px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+    }
+    .wordmark {
+        font-family: var(--serif);
+        font-weight: 600;
+        font-size: 1.25rem;
+        text-decoration: none;
+        color: var(--ink);
+    }
+    .wordmark span { color: var(--accent); }
+    .site-header nav a {
+        font-size: 0.92rem;
+        text-decoration: none;
+        color: var(--ink-soft);
+        margin-left: 18px;
+    }
+    .site-header nav a:hover { color: var(--accent); }
+
+    main {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 40px 24px 80px 24px;
+    }
+
+    .site-footer {
+        border-top: 1px solid var(--line);
+        margin-top: 60px;
+    }
+    .site-footer-inner {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 24px 24px 40px 24px;
+        font-size: 0.85rem;
+        color: var(--ink-soft);
+    }
+    .site-footer-inner p { max-width: 68ch; }
+
+    h1, h2, h3 { font-family: var(--serif); font-weight: 600; line-height: 1.2; }
+    .lede {
+        font-size: 1.1rem;
+        color: var(--ink-soft);
+        max-width: 62ch;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 3px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        border: 1px solid transparent;
+    }
+    .badge-green { background: var(--green-soft); color: var(--green); border-color: var(--green); }
+    .badge-red { background: var(--red-soft); color: var(--red); border-color: var(--red); }
+    .badge-amber { background: var(--amber-soft); color: var(--amber); border-color: var(--amber); }
+    .badge-neutral { background: #eef0f3; color: var(--ink-soft); border-color: #9ca3af; }
+
+    @media (prefers-reduced-motion: reduce) {
+        * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+</style>
+
+</head>
+<body>
+
+<header class="site-header">
+    <div class="site-header-inner">
+        <a class="wordmark" href="index.html">Check<span>Before</span>YouSign</a>
+        <nav>
+            <a href="index.html">States</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    
+<h1 style="font-size: 2.1rem; max-width: 20ch;">Check a solar installer's license before you sign anything.</h1>
+<p class="lede">
+    Every state licenses solar and electrical contractors differently, and several states have no
+    dedicated "solar installer" category at all — meaning a real installer can be licensed under a
+    generic electrical or building classification with nothing marking them as solar-specific. This
+    site cross-references each state's own public licensing records so you can look a contractor up
+    directly, rather than trusting a website or a doorstep pitch.
+</p>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-top: 36px;">
+    
+    <a href="az.html" style="text-decoration: none; color: inherit;">
+        <div style="
+            background: var(--paper-panel);
+            border: 1px solid var(--line);
+            border-left: 4px dashed var(--accent);
+            border-radius: 2px;
+            padding: 18px 20px;
+            height: 100%;
+        ">
+            <div style="font-family: var(--serif); font-size: 1.3rem; font-weight: 600;">Arizona</div>
+            <div style="font-size: 1.6rem; font-weight: 700; margin-top: 6px;">665</div>
+            <div style="font-size: 0.82rem; color: var(--ink-soft); margin-top: 2px;">
+                installers verified so far
+            </div>
+            <div style="font-size: 0.78rem; color: var(--ink-soft); margin-top: 10px; line-height: 1.4;">
+                Heuristic match against the full contractor roster — not a dedicated solar license.
+            </div>
+        </div>
+    </a>
+    
+    <a href="tx.html" style="text-decoration: none; color: inherit;">
+        <div style="
+            background: var(--paper-panel);
+            border: 1px solid var(--line);
+            border-left: 4px solid var(--accent);
+            border-radius: 2px;
+            padding: 18px 20px;
+            height: 100%;
+        ">
+            <div style="font-family: var(--serif); font-size: 1.3rem; font-weight: 600;">Texas</div>
+            <div style="font-size: 1.6rem; font-weight: 700; margin-top: 6px;">56</div>
+            <div style="font-size: 0.82rem; color: var(--ink-soft); margin-top: 2px;">
+                licensed contractors on file
+            </div>
+            <div style="font-size: 0.78rem; color: var(--ink-soft); margin-top: 10px; line-height: 1.4;">
+                Complete registry — sales registration only, not an installation license.
+            </div>
+        </div>
+    </a>
+    
+    <a href="fl.html" style="text-decoration: none; color: inherit;">
+        <div style="
+            background: var(--paper-panel);
+            border: 1px solid var(--line);
+            border-left: 4px solid var(--accent);
+            border-radius: 2px;
+            padding: 18px 20px;
+            height: 100%;
+        ">
+            <div style="font-family: var(--serif); font-size: 1.3rem; font-weight: 600;">Florida</div>
+            <div style="font-size: 1.6rem; font-weight: 700; margin-top: 6px;">617</div>
+            <div style="font-size: 0.82rem; color: var(--ink-soft); margin-top: 2px;">
+                licensed contractors on file
+            </div>
+            <div style="font-size: 0.78rem; color: var(--ink-soft); margin-top: 10px; line-height: 1.4;">
+                Dedicated solar classification (CVC), supplemented by an electrical-contractor name match.
+            </div>
+        </div>
+    </a>
+    
+    <a href="ca.html" style="text-decoration: none; color: inherit;">
+        <div style="
+            background: var(--paper-panel);
+            border: 1px solid var(--line);
+            border-left: 4px solid var(--accent);
+            border-radius: 2px;
+            padding: 18px 20px;
+            height: 100%;
+        ">
+            <div style="font-family: var(--serif); font-size: 1.3rem; font-weight: 600;">California</div>
+            <div style="font-size: 1.6rem; font-weight: 700; margin-top: 6px;">1,082</div>
+            <div style="font-size: 0.82rem; color: var(--ink-soft); margin-top: 2px;">
+                licensed contractors on file
+            </div>
+            <div style="font-size: 0.78rem; color: var(--ink-soft); margin-top: 10px; line-height: 1.4;">
+                Dedicated C-46 solar classification — status field not yet available in this data.
+            </div>
+        </div>
+    </a>
+    
+    <a href="mi.html" style="text-decoration: none; color: inherit;">
+        <div style="
+            background: var(--paper-panel);
+            border: 1px solid var(--line);
+            border-left: 4px dashed var(--accent);
+            border-radius: 2px;
+            padding: 18px 20px;
+            height: 100%;
+        ">
+            <div style="font-family: var(--serif); font-size: 1.3rem; font-weight: 600;">Michigan</div>
+            <div style="font-size: 1.6rem; font-weight: 700; margin-top: 6px;">19</div>
+            <div style="font-size: 0.82rem; color: var(--ink-soft); margin-top: 2px;">
+                installers verified so far
+            </div>
+            <div style="font-size: 0.78rem; color: var(--ink-soft); margin-top: 10px; line-height: 1.4;">
+                Individually hand-verified — smallest and most manually-checked list of the five.
+            </div>
+        </div>
+    </a>
+    
+</div>
+
+<h2 style="margin-top: 56px; font-size: 1.4rem;">How this works</h2>
+<ol style="max-width: 62ch; padding-left: 22px; color: var(--ink-soft);">
+    <li style="margin-bottom: 10px;">
+        <strong style="color: var(--ink);">Source</strong> — each state's contractor licensing board
+        publishes some form of public record: a licensee roster, a disciplinary ledger, or both.
+    </li>
+    <li style="margin-bottom: 10px;">
+        <strong style="color: var(--ink);">Cross-reference</strong> — where a state has no dedicated
+        solar classification, real installers are often licensed under an unrelated category (usually
+        "Electrical Contractor" or a general building license) with nothing marking them as solar. This
+        site checks against known solar installer names to catch those cases rather than trusting a
+        state's classification labels alone.
+    </li>
+    <li>
+        <strong style="color: var(--ink);">Flag, honestly</strong> — where a state's data can confirm a
+        contractor's current status or discipline history, this site shows it. Where it can't yet — no
+        disciplinary source has been built for that state, or a name-match hasn't been reviewed by a
+        person — this site says so plainly rather than implying a clean record it hasn't actually checked.
+    </li>
+</ol>
+
+</main>
+
+<footer class="site-footer">
+    <div class="site-footer-inner">
+        <p>
+            This site cross-references public licensing, disciplinary, and registration records
+            published by each state's contractor licensing board. It is not affiliated with, endorsed
+            by, or operated on behalf of any state agency. Data reflects what each agency had published
+            as of the retrieval date shown on each page and is not a substitute for confirming a
+            contractor's status directly with the relevant state board before hiring.
+        </p>
+    </div>
+</footer>
+
+</body>
+</html>

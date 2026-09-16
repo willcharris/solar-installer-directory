@@ -1,0 +1,259 @@
+#!/usr/bin/env python3
+"""
+Builds the static site from all 5 states' data sources into ./docs/
+(GitHub Pages convention: serve from /docs on the main branch).
+
+Each state's loader decides, based on what that state's data actually
+supports, what can honestly be shown -- not a uniform status scheme
+forced across five very different data sources. Specifically:
+
+  AZ  - heuristic-caught subset of a generic contractor roster
+        (is_solar_relevant=1, status=Active). Real status data, but not
+        a dedicated solar classification -- card shown as incomplete.
+  TX  - complete dedicated Solar Residential Retailer registry.
+        Sales-registration only; see the framing text on that page.
+  FL  - CVC (dedicated solar classification) + EC name-matched rows,
+        each labeled which is which in the table itself.
+  CA  - complete dedicated C-46 registry. No status field exists in
+        this data at all -- shows expiration date only, no invented
+        Active/Expired badge.
+  MI  - fully individually-verified curated set (19 businesses), the
+        smallest and most manually-checked of the five.
+
+Usage:
+    python build_site.py --config sources.json --out docs
+"""
+
+import argparse
+import csv
+import json
+import sqlite3
+from collections import defaultdict
+from datetime import date
+from pathlib import Path
+
+from jinja2 import Environment, FileSystemLoader
+
+TEMPLATES_DIR = Path(__file__).parent / "templates"
+
+
+def _title_city(city: str) -> str:
+    """Normalize display capitalization -- source data is inconsistent
+    (e.g. LARA's raw export mixes 'ALLENDALE' and 'portage')."""
+    return (city or "").title()
+
+
+def badge(label: str, kind: str) -> str:
+    return f'<span class="badge badge-{kind}">{label}</span>'
+
+
+def load_az(db_path: str) -> list[dict]:
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    rows = []
+    for r in conn.execute(
+        "SELECT business_name, dba, city, status FROM licenses "
+        "WHERE is_solar_relevant = 1 AND status = 'Active' ORDER BY business_name"
+    ):
+        name = r["dba"] or r["business_name"]
+        rows.append({"name": name, "city": _title_city(r["city"]), "detail_html": badge("Active", "green")})
+    conn.close()
+    return rows
+
+
+def load_tx(db_path: str) -> list[dict]:
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    rows = []
+    for r in conn.execute(
+        """
+        SELECT t.business_name, t.city, s.status FROM tx_solar_retailers t
+        LEFT JOIN (
+            SELECT license_number, status,
+                   ROW_NUMBER() OVER (PARTITION BY license_number ORDER BY scraped_at DESC) rn
+            FROM tx_solar_retailer_snapshots
+        ) s ON s.license_number = t.license_number AND s.rn = 1
+        ORDER BY t.business_name
+        """
+    ):
+        status = r["status"] or "Unknown"
+        kind = "green" if status == "Current" else "neutral"
+        rows.append({"name": r["business_name"], "city": _title_city(r["city"]), "detail_html": badge(status, kind)})
+    conn.close()
+    return rows
+
+
+FL_CONFIRMED_STATUS = {("C", "A"): ("Active", "green"), ("C", "I"): ("Inactive", "amber")}
+
+
+def load_fl(db_path: str) -> list[dict]:
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    rows = []
+    for r in conn.execute(
+        "SELECT licensee_name, dba_name, city, primary_status, secondary_status, match_type "
+        "FROM fl_solar_licensees ORDER BY dba_name, licensee_name"
+    ):
+        name = (r["dba_name"] or "").strip() or r["licensee_name"]
+        key = ((r["primary_status"] or "").strip(), (r["secondary_status"] or "").strip())
+        if key in FL_CONFIRMED_STATUS:
+            label, kind = FL_CONFIRMED_STATUS[key]
+        else:
+            label, kind = "Unverified status", "neutral"
+        detail = badge(label, kind)
+        if r["match_type"] == "EC name-matched":
+            detail += ' <span style="font-size:0.75rem;color:var(--ink-soft);">(EC, name-matched)</span>'
+        rows.append({"name": name, "city": _title_city(r["city"]), "detail_html": detail})
+    conn.close()
+    return rows
+
+
+def load_ca(db_path: str) -> list[dict]:
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    rows = []
+    for r in conn.execute(
+        "SELECT business_name, city, expiration_date FROM licenses ORDER BY business_name"
+    ):
+        exp = r["expiration_date"] or "not available"
+        # No status field exists in this data -- show expiration only,
+        # never an invented Active/Expired badge.
+        detail = f'<span style="color:var(--ink-soft);font-size:0.85rem;">Expires {exp}</span>'
+        rows.append({"name": r["business_name"], "city": _title_city(r["city"]), "detail_html": detail})
+    conn.close()
+    return rows
+
+
+def load_mi(enriched_csv_path: str) -> list[dict]:
+    by_name = defaultdict(list)
+    with open(enriched_csv_path, encoding="utf-8-sig", newline="") as f:
+        for r in csv.DictReader(f):
+            if r["confidence"] != "high":
+                continue
+            by_name[r["candidate_name"]].append(r)
+
+    rows = []
+    for name, recs in sorted(by_name.items()):
+        badges = []
+        for r in recs:
+            status = (r.get("license_status") or "Unknown").strip()
+            kind = "green" if status == "Issued" else ("amber" if status in ("Inactive",) else "red")
+            short_type = r["license_type"].replace("Residential Builder", "RB").replace(" Company", "")
+            badges.append(badge(f"{short_type}: {status}", kind))
+        rows.append({"name": name, "city": _title_city(recs[0].get("license_city", "")), "detail_html": " ".join(badges)})
+    return rows
+
+
+STATE_LOADERS = {
+    "az": {
+        "name": "Arizona", "loader": load_az, "complete": False,
+        "framing": (
+            "Arizona has no dedicated solar contractor classification. This list is every business "
+            "in the state's full contractor roster whose name or classification text contains "
+            "\"solar\" and whose license is currently Active — a reliable but not exhaustive signal, "
+            "since a real installer with a generic business name (e.g. operating simply as an "
+            "\"Electrical Contractor\") would not be caught by this method. A separate matching pass "
+            "has identified additional likely installers not yet individually reviewed; they are not "
+            "included here yet."
+        ),
+        "source_name": "AZ Registrar of Contractors public posting list",
+        "blurb": "Heuristic match against the full contractor roster — not a dedicated solar license.",
+    },
+    "tx": {
+        "name": "Texas", "loader": load_tx, "complete": True,
+        "framing": (
+            "Texas created a dedicated Solar Residential Retailer registration in 2026 (SB 1036). This "
+            "is the complete list of registered retailers. Important: this registration covers the "
+            "sales/lease transaction only — it is not an installation-competency license. The actual "
+            "installation work is separately governed by licensed Electrical Contractors, who are "
+            "exempt from registering here at all; this site does not yet cross-reference that "
+            "separate dataset."
+        ),
+        "source_name": "Texas TDLR Residential Solar Retailer program",
+        "blurb": "Complete registry — sales registration only, not an installation license.",
+    },
+    "fl": {
+        "name": "Florida", "loader": load_fl, "complete": True,
+        "framing": (
+            "Florida has a dedicated Certified Solar Contractor (CVC) classification, shown here "
+            "alongside Electrical Contractors whose name indicates solar work (Florida law allows EC "
+            "licensees to perform solar installation without holding a CV credential). Rows marked "
+            "\"EC, name-matched\" have not been checked against disciplinary records — only CVC-classified "
+            "rows have a confirmed clean-or-flagged history."
+        ),
+        "source_name": "Florida DBPR / Construction Industry Licensing Board",
+        "blurb": "Dedicated solar classification (CVC), supplemented by an electrical-contractor name match.",
+    },
+    "ca": {
+        "name": "California", "loader": load_ca, "complete": True,
+        "framing": (
+            "California's C-46 Solar Contractor classification is dedicated and well established. "
+            "This data does not currently include a status field — expiration date is shown instead "
+            "of an Active/Expired label, since asserting one without the underlying field would be a "
+            "claim this site cannot actually back up. Disciplinary records have not yet been "
+            "populated for California."
+        ),
+        "source_name": "California CSLB C-46 license roster",
+        "blurb": "Dedicated C-46 solar classification — status field not yet available in this data.",
+    },
+    "mi": {
+        "name": "Michigan", "loader": load_mi, "complete": False,
+        "framing": (
+            "Michigan has no solar-specific license at all — solar work legally requires licenses "
+            "under up to three unrelated categories (Residential Builder, a Roofing-classified "
+            "Maintenance & Alteration license, and Electrical Contractor), none of which mention solar "
+            "anywhere. Every business below has been individually matched by name and its real license "
+            "status confirmed directly. This is a small, hand-verified starting list, not a complete "
+            "directory of Michigan solar installers."
+        ),
+        "source_name": "Michigan LARA / Bureau of Construction Codes",
+        "blurb": "Individually hand-verified — smallest and most manually-checked list of the five.",
+    },
+}
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--config", required=True, help="JSON file mapping state slug -> data source path(s)")
+    ap.add_argument("--out", default="docs")
+    args = ap.parse_args()
+
+    with open(args.config) as f:
+        config = json.load(f)
+
+    out_dir = Path(args.out)
+    out_dir.mkdir(exist_ok=True)
+
+    env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)))
+    today = date.today().isoformat()
+
+    state_summaries = []
+    for slug, meta in STATE_LOADERS.items():
+        if slug not in config:
+            print(f"  (skipping {slug} -- not in config)")
+            continue
+        path = config[slug]
+        rows = meta["loader"](path)
+        print(f"  {slug}: {len(rows)} rows")
+
+        state_summaries.append(
+            {"slug": slug, "name": meta["name"], "count": len(rows),
+             "complete": meta["complete"], "blurb": meta["blurb"]}
+        )
+
+        template = env.get_template("state.html")
+        html = template.render(
+            root="", state_name=meta["name"], framing=meta["framing"],
+            source_name=meta["source_name"], retrieved_date=today, rows=rows,
+        )
+        (out_dir / f"{slug}.html").write_text(html, encoding="utf-8")
+
+    index_template = env.get_template("index.html")
+    index_html = index_template.render(root="", states=state_summaries)
+    (out_dir / "index.html").write_text(index_html, encoding="utf-8")
+
+    print(f"\nWrote {len(state_summaries) + 1} pages to {out_dir}/")
+
+
+if __name__ == "__main__":
+    main()

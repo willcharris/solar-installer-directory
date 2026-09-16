@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Solar Installer Check — verify a solar contractor's license{% endblock %}
+
+{% block content %}
+<h1 style="font-size: 2.1rem; max-width: 20ch;">Check a solar installer's license before you sign anything.</h1>
+<p class="lede">
+    Every state licenses solar and electrical contractors differently, and several states have no
+    dedicated "solar installer" category at all — meaning a real installer can be licensed under a
+    generic electrical or building classification with nothing marking them as solar-specific. This
+    site cross-references each state's own public licensing records so you can look a contractor up
+    directly, rather than trusting a website or a doorstep pitch.
+</p>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-top: 36px;">
+    {% for state in states %}
+    <a href="{{ root }}{{ state.slug }}.html" style="text-decoration: none; color: inherit;">
+        <div style="
+            background: var(--paper-panel);
+            border: 1px solid var(--line);
+            border-left: 4px {{ 'solid' if state.complete else 'dashed' }} var(--accent);
+            border-radius: 2px;
+            padding: 18px 20px;
+            height: 100%;
+        ">
+            <div style="font-family: var(--serif); font-size: 1.3rem; font-weight: 600;">{{ state.name }}</div>
+            <div style="font-size: 1.6rem; font-weight: 700; margin-top: 6px;">{{ "{:,}".format(state.count) }}</div>
+            <div style="font-size: 0.82rem; color: var(--ink-soft); margin-top: 2px;">
+                {{ "licensed contractors on file" if state.complete else "installers verified so far" }}
+            </div>
+            <div style="font-size: 0.78rem; color: var(--ink-soft); margin-top: 10px; line-height: 1.4;">
+                {{ state.blurb }}
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+
+<h2 style="margin-top: 56px; font-size: 1.4rem;">How this works</h2>
+<ol style="max-width: 62ch; padding-left: 22px; color: var(--ink-soft);">
+    <li style="margin-bottom: 10px;">
+        <strong style="color: var(--ink);">Source</strong> — each state's contractor licensing board
+        publishes some form of public record: a licensee roster, a disciplinary ledger, or both.
+    </li>
+    <li style="margin-bottom: 10px;">
+        <strong style="color: var(--ink);">Cross-reference</strong> — where a state has no dedicated
+        solar classification, real installers are often licensed under an unrelated category (usually
+        "Electrical Contractor" or a general building license) with nothing marking them as solar. This
+        site checks against known solar installer names to catch those cases rather than trusting a
+        state's classification labels alone.
+    </li>
+    <li>
+        <strong style="color: var(--ink);">Flag, honestly</strong> — where a state's data can confirm a
+        contractor's current status or discipline history, this site shows it. Where it can't yet — no
+        disciplinary source has been built for that state, or a name-match hasn't been reviewed by a
+        person — this site says so plainly rather than implying a clean record it hasn't actually checked.
+    </li>
+</ol>
+{% endblock %}

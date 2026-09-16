@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Texas solar installers — Solar Installer Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --ink: #1f2430;
+        --ink-soft: #4b5563;
+        --paper: #f7f6f3;
+        --paper-panel: #ffffff;
+        --line: #d9d5cd;
+        --accent: #2563a8;
+        --accent-soft: #eaf2fb;
+        --green: #1e7e34;
+        --green-soft: #e6f4ea;
+        --red: #a11d1d;
+        --red-soft: #fdecea;
+        --amber: #a15c00;
+        --amber-soft: #fff4e0;
+        --serif: "Source Serif 4", Georgia, serif;
+        --sans: "Public Sans", -apple-system, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+        margin: 0;
+        font-family: var(--sans);
+        color: var(--ink);
+        background: var(--paper);
+        line-height: 1.55;
+    }
+    a { color: var(--accent); }
+    a:focus-visible, button:focus-visible, input:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 2px;
+    }
+
+    .site-header {
+        border-bottom: 1px solid var(--line);
+        background: var(--paper-panel);
+    }
+    .site-header-inner {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 18px 24px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+    }
+    .wordmark {
+        font-family: var(--serif);
+        font-weight: 600;
+        font-size: 1.25rem;
+        text-decoration: none;
+        color: var(--ink);
+    }
+    .wordmark span { color: var(--accent); }
+    .site-header nav a {
+        font-size: 0.92rem;
+        text-decoration: none;
+        color: var(--ink-soft);
+        margin-left: 18px;
+    }
+    .site-header nav a:hover { color: var(--accent); }
+
+    main {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 40px 24px 80px 24px;
+    }
+
+    .site-footer {
+        border-top: 1px solid var(--line);
+        margin-top: 60px;
+    }
+    .site-footer-inner {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 24px 24px 40px 24px;
+        font-size: 0.85rem;
+        color: var(--ink-soft);
+    }
+    .site-footer-inner p { max-width: 68ch; }
+
+    h1, h2, h3 { font-family: var(--serif); font-weight: 600; line-height: 1.2; }
+    .lede {
+        font-size: 1.1rem;
+        color: var(--ink-soft);
+        max-width: 62ch;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 3px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        border: 1px solid transparent;
+    }
+    .badge-green { background: var(--green-soft); color: var(--green); border-color: var(--green); }
+    .badge-red { background: var(--red-soft); color: var(--red); border-color: var(--red); }
+    .badge-amber { background: var(--amber-soft); color: var(--amber); border-color: var(--amber); }
+    .badge-neutral { background: #eef0f3; color: var(--ink-soft); border-color: #9ca3af; }
+
+    @media (prefers-reduced-motion: reduce) {
+        * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+</style>
+
+</head>
+<body>
+
+<header class="site-header">
+    <div class="site-header-inner">
+        <a class="wordmark" href="index.html">Check<span>Before</span>YouSign</a>
+        <nav>
+            <a href="index.html">States</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    
+<p style="margin-bottom: 4px;"><a href="index.html">&larr; All states</a></p>
+<h1 style="font-size: 2rem;">Texas</h1>
+<p class="lede">Texas created a dedicated Solar Residential Retailer registration in 2026 (SB 1036). This is the complete list of registered retailers. Important: this registration covers the sales/lease transaction only — it is not an installation-competency license. The actual installation work is separately governed by licensed Electrical Contractors, who are exempt from registering here at all; this site does not yet cross-reference that separate dataset.</p>
+<p style="font-size: 0.85rem; color: var(--ink-soft);">
+    56 listed &middot; source: Texas TDLR Residential Solar Retailer program &middot; retrieved 2026-09-16
+</p>
+
+<input
+    id="filter-box"
+    type="text"
+    placeholder="Filter by business name or city&hellip;"
+    aria-label="Filter by business name or city"
+    style="
+        width: 100%;
+        max-width: 420px;
+        padding: 10px 14px;
+        margin: 20px 0 18px 0;
+        font-family: var(--sans);
+        font-size: 0.95rem;
+        border: 1px solid var(--line);
+        border-radius: 3px;
+        background: var(--paper-panel);
+    "
+>
+
+<table id="installer-table" style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+    <thead>
+        <tr style="border-bottom: 2px solid var(--ink);">
+            <th style="text-align: left; padding: 8px 10px 8px 4px;">Business</th>
+            <th style="text-align: left; padding: 8px 10px;">City</th>
+            <th style="text-align: left; padding: 8px 4px;">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">APEX EQUITY PARTNERS LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Dallas</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">APEX SUMMIT GROUP</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Houston</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">ARCASA SERVICES LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">American Fork</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">AXIA SOLAR CORP.</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Irvine</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">DCE ELECTRIC LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Fort Worth</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">DFW SOLAR ELECTRIC LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Flower Mound</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">DOUBLE EAGLE AE LLC </td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Dallas</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">DYNAMIC SLR INC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Richardson</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">EASTEX SOLAR LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Palestine</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">EMPOWER ENERGY SOLUTIONS LLC </td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Frisco</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">ENERGY RENOVATION CENTER, INC.</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Arlington</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">ENERGYZE POWER CO</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Katy</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">ENFIN CORP.</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Irvine</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">ESTRADA CUSTOM HOMES LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">El Paso</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">GIRASOLVE ENERGY LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Round Rock</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">GOOD FAITH ENERGY, LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Addison</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">GOODPWR SOLAR LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Arvada</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">GREENSTAR POWER</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Round Rock</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">HARVEST SOLAR INC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Garland</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">HONEST SOLAR LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Austin</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">ICON POWER LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Tempe</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">INSPIRE SOLAR LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Plano</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">ION DEVELOPER, LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Orem</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">LEGATUS COMPANY LLC </td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Dallas</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">LIMITLESS ELECTRIC LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Spring</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">LUMINATE ENERGY </td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Cypress</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">MCF SOLAR LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Lufkin</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">NSI GROUP, LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Mcallen</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">ONEWORLDENERGY LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Phoenix</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">PEOPLE'S CHOICE SOLAR, LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Mcallen </td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">POWUR, PBC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Del Mar</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">PSALM SOLAR</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Allen</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">READY EVERY SECOND SOLAR, INC.</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Houston</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">REVELATION PWR LLC.</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Weatherford</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">SHARIF TECHNOLOGIES, INC.</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Austin</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">SKYLINQ HOME</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Dallas</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">SOLAR BROS ELECTRIC, LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Arlington</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">SOLAR CENTEX, LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Harker Heights</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">SOLAR POWER INTEGRATOR</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Corpus Christi</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">SOLAR SALES OF NORTH AMERICA INC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Frisco</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">SOLAR SCOUTS OPERATIONS, LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Fredericksburg</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">SOLAR SMART LIVING, LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Santa Teresa</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">SOLARIZE LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Farmers Branch</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">SOLRITE ELECTRIC LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">San Marcos</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">SOLSTICE SOLAR LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Houston</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">SUNRUN INSTALLATION SERVICES INC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Lehi</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">SUNSHINE RENEWABLE SOLUTIONS LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Houston</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">SYNERGY TEMPERATURE CONTROL LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">El Paso</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">TEXAS DIRECT SOLAR</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Houston</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">TEXAS SOLAR AND ROOFING PROS</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Cedar Park</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">TEXAS SOLAR GUYS</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Buda</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">THE LIGHT GROUP USA LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Grand Prairie</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">TML INTERNATIONAL LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Vancouver</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">TOP TIER SOLAR SOLUTIONS LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Charlotte</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">WEST TEXAS SOLAR, LLC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Abilene</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+        <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">WICHITA FALLS/DAVIS ELECTRIC CO., INC</td>
+            <td style="padding: 9px 10px; color: var(--ink-soft);">Wichita Falls</td>
+            <td style="padding: 9px 4px;"><span class="badge badge-green">Current</span></td>
+        </tr>
+        
+    </tbody>
+</table>
+
+<p id="no-results" style="display: none; color: var(--ink-soft); margin-top: 20px;">
+    No matches. Try a shorter search term, or this business may not be in Texas's data yet
+    &mdash; absence from this list is not confirmation that a business is unlicensed.
+</p>
+
+<script>
+(function () {
+    var input = document.getElementById('filter-box');
+    var rows = Array.prototype.slice.call(document.querySelectorAll('.installer-row'));
+    var noResults = document.getElementById('no-results');
+    input.addEventListener('input', function () {
+        var q = input.value.trim().toLowerCase();
+        var visible = 0;
+        rows.forEach(function (row) {
+            var text = row.textContent.toLowerCase();
+            var match = text.indexOf(q) !== -1;
+            row.style.display = match ? '' : 'none';
+            if (match) visible++;
+        });
+        noResults.style.display = (visible === 0) ? 'block' : 'none';
+    });
+})();
+</script>
+
+</main>
+
+<footer class="site-footer">
+    <div class="site-footer-inner">
+        <p>
+            This site cross-references public licensing, disciplinary, and registration records
+            published by each state's contractor licensing board. It is not affiliated with, endorsed
+            by, or operated on behalf of any state agency. Data reflects what each agency had published
+            as of the retrieval date shown on each page and is not a substitute for confirming a
+            contractor's status directly with the relevant state board before hiring.
+        </p>
+    </div>
+</footer>
+
+</body>
+</html>

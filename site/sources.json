@@ -1,0 +1,7 @@
+{
+  "az": "data/az/az_roc.db",
+  "tx": "tx_tdlr_solar.db",
+  "fl": "fl_scoping/fl_solar.db",
+  "ca": "cslb_solar.db",
+  "mi": "pipelines/mi/enriched_mi.csv"
+}
