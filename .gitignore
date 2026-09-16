@@ -14,3 +14,6 @@ pipelines/mi/test_report.pdf
 pipelines/mi/*.pdf
 texas/*.pdf
 pipelines/az/matches_az.csv
+fl_scoping/*.pdf
+fl_scoping/fl_solar_out/
+fl_scoping/*.db

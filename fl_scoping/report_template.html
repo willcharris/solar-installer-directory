@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{ display_name }} — Florida Solar Licensee Report</title>
+<style>
+    @page {
+        size: letter;
+        margin: 0.75in 0.85in;
+        @bottom-center {
+            content: "Generated from public Florida DBPR/CILB license records. Not affiliated with or endorsed by DBPR.";
+            font-size: 7.5pt;
+            color: #8a8a8a;
+            font-family: "Helvetica Neue", Arial, sans-serif;
+        }
+    }
+    body {
+        font-family: "Helvetica Neue", Arial, sans-serif;
+        color: #1f2430;
+        font-size: 10.5pt;
+        line-height: 1.5;
+    }
+    .header {
+        border-bottom: 3px solid #1f2430;
+        padding-bottom: 10px;
+        margin-bottom: 12px;
+    }
+    .eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 8pt;
+        color: #6b7280;
+        font-weight: 600;
+    }
+    h1 { font-size: 22pt; margin: 4px 0 2px 0; }
+    .individual-note {
+        font-size: 9.5pt;
+        color: #4b5563;
+        font-style: italic;
+        margin-bottom: 4px;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 4px 14px;
+        border-radius: 3px;
+        font-weight: 700;
+        font-size: 10pt;
+        letter-spacing: 0.03em;
+        margin-top: 6px;
+    }
+    .status-active { background: #e6f4ea; color: #1e7e34; border: 1px solid #1e7e34; }
+    .status-inactive { background: #fff4e0; color: #a15c00; border: 1px solid #a15c00; }
+    .status-unverified { background: #eef0f3; color: #4b5563; border: 1px solid #9ca3af; }
+
+    .unverified-box {
+        background: #eef0f3;
+        border: 1px solid #cbd2d9;
+        border-left: 5px solid #6b7280;
+        border-radius: 3px;
+        padding: 8px 16px;
+        margin: 8px 0;
+        font-size: 9pt;
+        color: #374151;
+    }
+    .unverified-box .flag-title { font-weight: 700; margin-bottom: 2px; }
+
+    .grid { display: flex; gap: 24px; margin: 14px 0; }
+    .col { flex: 1; }
+    .field-label {
+        font-size: 8pt; text-transform: uppercase; letter-spacing: 0.05em;
+        color: #6b7280; margin-bottom: 1px;
+    }
+    .field-value { font-size: 11pt; margin-bottom: 10px; font-weight: 500; }
+
+    .section-title {
+        font-size: 12pt; font-weight: 700; margin: 16px 0 6px 0;
+        padding-bottom: 3px; border-bottom: 1px solid #d1d5db;
+    }
+
+    .scope-box {
+        background: #eaf2fb;
+        border: 1px solid #b9d3f0;
+        border-left: 5px solid #2563a8;
+        border-radius: 3px;
+        padding: 8px 16px;
+        margin: 6px 0;
+        font-size: 9.5pt;
+        color: #1f3a5c;
+    }
+    .scope-box .flag-title { font-weight: 700; margin-bottom: 3px; }
+
+    .flag-box {
+        background: #fdecea;
+        border: 1px solid #f3b6b0;
+        border-left: 5px solid #a11d1d;
+        border-radius: 3px;
+        padding: 8px 16px;
+        margin: 6px 0;
+    }
+    .flag-box .flag-title { font-weight: 700; color: #a11d1d; font-size: 10pt; margin-bottom: 2px; }
+    .flag-box .flag-meta { font-size: 8.5pt; color: #6b3b3b; }
+
+    .clean-box {
+        background: #e6f4ea;
+        border: 1px solid #b6ddc0;
+        border-left: 5px solid #1e7e34;
+        border-radius: 3px;
+        padding: 8px 16px;
+        margin: 6px 0;
+        font-size: 9.5pt;
+        color: #285e38;
+    }
+
+    .not-sourced-box {
+        background: #fff4e0;
+        border: 1px solid #f0d59a;
+        border-left: 5px solid #a15c00;
+        border-radius: 3px;
+        padding: 8px 16px;
+        margin: 6px 0;
+        font-size: 9pt;
+        color: #6b4a00;
+    }
+    .not-sourced-box .flag-title { font-weight: 700; margin-bottom: 2px; }
+
+    .source-note {
+        margin-top: 14px; padding-top: 8px; border-top: 1px solid #d1d5db;
+        font-size: 7.8pt; color: #6b7280;
+    }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <div class="eyebrow">Florida Solar Licensee Verification</div>
+    <h1>{{ display_name }}</h1>
+    {% if not has_dba %}
+    <div class="individual-note">Licensed as an individual -- no separate business (DBA) name on file.</div>
+    {% endif %}
+    <span class="status-badge status-{{ status_class }}">{{ status_label }}</span>
+</div>
+
+{% if status_unverified %}
+<div class="unverified-box">
+    <div class="flag-title">Status codes not independently confirmed</div>
+    DBPR's raw status codes for this license ({{ raw_primary_status or "?" }} / {{ raw_secondary_status or "?" }})
+    fall outside the two combinations this report has verified against DBPR's published status
+    definitions. Rather than guess what they mean, please confirm current status directly with DBPR.
+</div>
+{% endif %}
+
+<div class="grid">
+    <div class="col">
+        <div class="field-label">License Number</div>
+        <div class="field-value">{{ license_number }}</div>
+        <div class="field-label">Location</div>
+        <div class="field-value">{{ city }}, {{ state }} {{ zip_code }}</div>
+    </div>
+    <div class="col">
+        <div class="field-label">Originally Licensed</div>
+        <div class="field-value">{{ orig_licensure_date }}</div>
+        <div class="field-label">Expiration Date</div>
+        <div class="field-value">{{ expiration_date }}</div>
+    </div>
+</div>
+
+<div class="section-title">How This License Relates to Solar Work</div>
+{% if match_type == "CVC" %}
+<div class="scope-box">
+    <div class="flag-title">Certified Solar Contractor (CVC) -- Florida's dedicated solar license</div>
+    This is Florida's specific, dedicated solar contractor classification -- not a general
+    electrical or building license being inferred as solar-relevant.
+</div>
+{% else %}
+<div class="scope-box">
+    <div class="flag-title">Electrical Contractor, matched by name -- not a dedicated solar credential</div>
+    Florida law allows a licensed Electrical Contractor to perform solar (PV) installation work
+    without holding the separate Certified Solar Contractor (CVC) credential. This business was
+    identified as solar-relevant by its name, not by a dedicated classification -- it holds a
+    general Electrical Contractor license, verified for electrical work, but Florida has no
+    separate credential confirming solar-specific competency for this license type.
+</div>
+{% endif %}
+
+<div class="section-title">Disciplinary Actions &amp; Complaints</div>
+{% if discipline_checked %}
+    {% if discipline_count and discipline_count > 0 %}
+    <div class="flag-box">
+        <div class="flag-title">{{ discipline_count }} disciplinary record(s) on file</div>
+        <div class="flag-meta">
+            Most recent action: {{ latest_discipline_date or "date not available" }}
+            {% if dispositions_list %} &middot; Disposition(s): {{ dispositions_list | join(", ") }}{% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div class="clean-box">No disciplinary actions on file with DBPR's Construction Industry Licensing Board for this license.</div>
+    {% endif %}
+{% else %}
+<div class="not-sourced-box">
+    <div class="flag-title">Not checked for this license</div>
+    {{ discipline_note }}
+</div>
+{% endif %}
+
+<div class="source-note">
+    License data sourced from the Florida Department of Business and Professional Regulation
+    (DBPR) public license extracts (Construction and Electrical Contractor rosters), cross-referenced
+    against Construction Industry Licensing Board (CILB) disciplinary action reports where applicable.
+    This report reflects what DBPR had on file as of the retrieval date and is not a substitute for
+    confirming status directly with DBPR before hiring.
+</div>
+
+</body>
+</html>
