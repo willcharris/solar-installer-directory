@@ -13,3 +13,4 @@ pipelines/mi/enriched_mi.csv
 pipelines/mi/test_report.pdf
 pipelines/mi/*.pdf
 texas/*.pdf
+pipelines/az/matches_az.csv

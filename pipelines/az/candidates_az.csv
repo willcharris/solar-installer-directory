@@ -1,0 +1,45 @@
+business_name,city,source,notes
+Solar Topps,Phoenix,EnergySage+Places,2026 EnergySage AZ Installer of the Year; construction-engineering background
+Simple Solar,Multi-city AZ,EnergySage,Appears as top-5 in many AZ EnergySage city pages
+United Energy Partners,Multi-city AZ,EnergySage,Appears as top-5 in many AZ EnergySage city pages
+Sunforce Solar,Multi-city AZ,EnergySage,Appears as top-5 in many AZ EnergySage city pages
+River Sun Solutions,Lake Havasu City,EnergySage,Ranked #1 in Lake Havasu City and Mohave County per EnergySage
+Clayco Electric Inc.,Arizona,EnergySage,No "solar" in name -- a heuristic-miss test case; does solar work per EnergySage ranking
+Solar Optimum,Multi-city AZ,EnergySage,National installer with AZ presence
+IntegrateSun LLC,Arizona City,EnergySage,
+T&K Electric Company,Mesa,Places,No "solar" in name -- customer reviews explicitly describe solar battery and panel installs
+Black Platinum Solar & Electric,Phoenix,Places,Has "solar" in name -- likely already caught by the existing heuristic
+Watt Masters,Phoenix,Places,No "solar" in name -- reviews describe installing solar and servicing inverters; classified as electrician
+Envision Solar Inc,Phoenix,Places,Has "solar" in name; note -- a review explicitly states its AZROC license was suspended, useful disciplinary cross-check
+Independent Solar,Phoenix/Tucson,Places,Has "solar" in name
+Phoenix Valley Solar,Phoenix,Places,Has "solar" in name
+Rooftop Solar,"Phoenix / Flagstaff",Places,Two locations, same company; has "solar" in name
+Ultra Energy,Phoenix,Places,No "solar" in name -- reviews confirm solar panel installation
+Solar Gain,Tucson,Places,Has "solar" in name
+Technicians for Sustainability,Tucson,Places,No "solar" in name -- worker-owned solar installer, well-reviewed
+Net Zero Solar,Tucson,Places,Has "solar" in name
+The Solar Store,Tucson,Places,Has "solar" in name
+Canyon Solar LLC,Tucson,Places,Has "solar" in name
+Sabino Solar LLC,Tucson,Places,Has "solar" in name
+ReWired Energy,Tucson,Places,No "solar" in name -- reviews confirm panel and battery installation
+Custom Solar and Leisure,Tucson,Places,Has "solar" in name; also does solar pool heating
+Arizona Wholesale Solar,Mesa,Places,Has "solar" in name
+High Desert Energy,Mesa,Places,No "solar" in name -- reviews confirm residential solar installation
+Phelps Solar Specialists,Mesa,Places,Has "solar" in name; appears focused on solar pool heating, verify scope
+JIT Solar LLC,Mesa,Places,Has "solar" in name; reviews suggest possible closure -- complaint/bankruptcy-flag candidate
+SanTan Solar,Gilbert,Places,Has "solar" in name; appears to be primarily a panel wholesaler/distributor -- verify installer vs. supplier
+Arizona Solar Wave,Mesa,Places,Has "solar" in name
+Sun Valley Solar Solutions,Chandler,Places,Has "solar" in name
+Prometheus Solar,Flagstaff,Places,Has "solar" in name
+CMB Residential Electric and Solar,Flagstaff,Places,Has "solar" in name
+Navajo Power Home,Flagstaff,Places,No "solar" in name -- very low review count (3), mixed/negative sentiment
+Goodman Electric,Flagstaff,Places,No "solar" in name -- general electrician; no explicit solar review found, lower confidence
+Northern Arizona Wind & Sun,Flagstaff,Places,Operates as NAZ Solar Electric (DBA) -- registered legal name may not say "solar"; good test of business_name vs dba matching
+EcoEnergy Solutions,Yuma,Places,No "solar" in name -- primarily roofing/HVAC; reviews mention solar panel cleaning, not installation -- verify scope
+48Solar & Roofing LLC,Yuma,Places,Has "solar" in name
+Yuma Solar,Yuma,Places,Has "solar" in name
+Sunsolar Solutions,Yuma,Places,Has "solar" in name; mixed reviews incl. leaks and no-shows -- complaint candidate
+Renewable Power USA Headquarters,Yuma,Places,No "solar" in name -- reviews confirm solar panel and battery installation
+SunRate Energy,Yuma,Places,No "solar" in name -- reviews confirm solar installs; one review states distributor "no longer in business with" them
+Prime Time Solar Energy LLC,Yuma,Places,Has "solar" in name; only 1 review, low confidence
+Liggett Electrical Services LLC,Somerton,Places,No "solar" in name -- review confirms an active monitored solar system installed by this company
