@@ -12,3 +12,4 @@ pipelines/mi/enriched_mi_test.csv
 pipelines/mi/enriched_mi.csv
 pipelines/mi/test_report.pdf
 pipelines/mi/*.pdf
+texas/*.pdf

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{ business_name }} — Texas Solar Retailer Report</title>
+<style>
+    @page {
+        size: letter;
+        margin: 0.75in 0.85in;
+        @bottom-center {
+            content: "Generated from public Texas TDLR Residential Solar Retailer registration records. Not affiliated with or endorsed by TDLR.";
+            font-size: 7.5pt;
+            color: #8a8a8a;
+            font-family: "Helvetica Neue", Arial, sans-serif;
+        }
+    }
+    body {
+        font-family: "Helvetica Neue", Arial, sans-serif;
+        color: #1f2430;
+        font-size: 10.5pt;
+        line-height: 1.5;
+    }
+    .header {
+        border-bottom: 3px solid #1f2430;
+        padding-bottom: 10px;
+        margin-bottom: 12px;
+    }
+    .eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 8pt;
+        color: #6b7280;
+        font-weight: 600;
+    }
+    h1 {
+        font-size: 22pt;
+        margin: 4px 0 2px 0;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 4px 14px;
+        border-radius: 3px;
+        font-weight: 700;
+        font-size: 10pt;
+        letter-spacing: 0.03em;
+        margin-top: 6px;
+    }
+    .status-current { background: #e6f4ea; color: #1e7e34; border: 1px solid #1e7e34; }
+    .status-expired { background: #fff4e0; color: #a15c00; border: 1px solid #a15c00; }
+    .status-revoked { background: #fdecea; color: #a11d1d; border: 1px solid #a11d1d; }
+    .status-unknown { background: #eef0f3; color: #4b5563; border: 1px solid #9ca3af; }
+
+    .grid {
+        display: flex;
+        gap: 24px;
+        margin: 14px 0;
+    }
+    .col { flex: 1; }
+    .field-label {
+        font-size: 8pt;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #6b7280;
+        margin-bottom: 1px;
+    }
+    .field-value {
+        font-size: 11pt;
+        margin-bottom: 10px;
+        font-weight: 500;
+    }
+
+    .section-title {
+        font-size: 12pt;
+        font-weight: 700;
+        margin: 16px 0 6px 0;
+        padding-bottom: 3px;
+        border-bottom: 1px solid #d1d5db;
+    }
+
+    .scope-box {
+        background: #eaf2fb;
+        border: 1px solid #b9d3f0;
+        border-left: 5px solid #2563a8;
+        border-radius: 3px;
+        padding: 10px 16px;
+        margin: 8px 0;
+        font-size: 9.5pt;
+        color: #1f3a5c;
+    }
+    .scope-box .flag-title {
+        font-weight: 700;
+        margin-bottom: 3px;
+    }
+
+    .not-sourced-box {
+        background: #fff4e0;
+        border: 1px solid #f0d59a;
+        border-left: 5px solid #a15c00;
+        border-radius: 3px;
+        padding: 8px 16px;
+        margin: 6px 0;
+        font-size: 9pt;
+        color: #6b4a00;
+    }
+    .not-sourced-box .flag-title {
+        font-weight: 700;
+        margin-bottom: 2px;
+    }
+
+    .source-note {
+        margin-top: 14px;
+        padding-top: 8px;
+        border-top: 1px solid #d1d5db;
+        font-size: 7.8pt;
+        color: #6b7280;
+    }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <div class="eyebrow">Texas Solar Retailer Registration Verification</div>
+    <h1>{{ business_name }}</h1>
+    <span class="status-badge status-{{ status_class }}">{{ status_label }}</span>
+</div>
+
+<div class="grid">
+    <div class="col">
+        <div class="field-label">Registration Number</div>
+        <div class="field-value">{{ license_number }}</div>
+        <div class="field-label">Address</div>
+        <div class="field-value">
+            {{ address1 }}{% if address2 %}, {{ address2 }}{% endif %}<br>
+            {{ city }}, {{ state }} {{ zip_code }}{% if county %} ({{ county }} County){% endif %}
+        </div>
+    </div>
+    <div class="col">
+        <div class="field-label">Phone</div>
+        <div class="field-value">{{ phone or "Not listed" }}</div>
+        <div class="field-label">Expiration Date</div>
+        <div class="field-value">{{ expiration_date or "Not available" }}</div>
+        <div class="field-label">On File Since</div>
+        <div class="field-value">{{ first_seen_at or "Not available" }}</div>
+    </div>
+</div>
+
+<div class="section-title">What This Registration Covers</div>
+<div class="scope-box">
+    <div class="flag-title">Sales registration, not an installation license</div>
+    Texas's Residential Solar Retailer registration (created by SB 1036) governs the
+    <strong>sales/lease transaction</strong> for a residential solar system — required contract
+    disclosures, the right to cancel, and a ban on misleading claims. It is <strong>not</strong> a
+    license verifying installation competency. The actual installation work is separately governed
+    by licensed Electrical Contractors under Texas's Electrical Safety and Licensing Act — and
+    electrical contractors are exempt from registering as solar retailers at all. Verifying who is
+    licensed to physically install this system is a separate check this report does not yet include.
+</div>
+
+<div class="section-title">Disciplinary Actions &amp; Complaints</div>
+<div class="not-sourced-box">
+    <div class="flag-title">Not yet available for Texas</div>
+    This directory has not yet built a disciplinary-action, BBB complaint, or bankruptcy-filing data
+    source for Texas solar retailers. The absence of flags here means this hasn't been checked yet —
+    it is not a claim that this business has a clean record.
+</div>
+
+<div class="source-note">
+    Registration data sourced from the Texas Department of Licensing and Regulation (TDLR)
+    Residential Solar Retailer program public license export, snapshot recorded {{ last_snapshot_at }}.
+    This program launched in August 2026; status history is limited and this pipeline does not yet
+    detect a registration silently disappearing from a future export. This report reflects what TDLR
+    had on file as of the snapshot date and is not a substitute for confirming status directly with
+    TDLR before hiring.
+</div>
+
+</body>
+</html>
