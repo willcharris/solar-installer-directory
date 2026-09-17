@@ -17,3 +17,4 @@ pipelines/az/matches_az.csv
 fl_scoping/*.pdf
 fl_scoping/fl_solar_out/
 fl_scoping/*.db
+scraper/test_report.pdf
