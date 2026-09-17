@@ -67,6 +67,36 @@ def load_az(db_path: str) -> list[dict]:
             "name": name, "city": _title_city(r["city"]), "detail_html": badge("Active", "green"),
             "report_url": f"reports/az/{r['license_no']}.pdf",
         })
+
+    # Manually reviewed additions from the fuzzy-matching pass (candidates
+    # not caught by the "solar" name/classification heuristic above --
+    # e.g. plain-named electricians who genuinely do solar work). Each of
+    # these 9 was individually checked against matches_az.csv and confirmed
+    # to be a real, correct match, not a coincidental name overlap. Two
+    # other high-scoring matches from that same pass -- "High Desert
+    # Energy" (matched a business with an unrelated classification) and
+    # "Prime Time Solar Energy LLC" (matched a differently-named company
+    # on a single shared word, backed by only 1 online review) -- were
+    # deliberately EXCLUDED as likely false positives. Do not add them
+    # here without re-verifying independently.
+    reviewed_additions = [
+        ("355491", "River Sun Solutions LLC", "Lake Havasu City"),
+        ("316266", "Clayco Electric Inc", "Tucson"),
+        ("345197", "IntegrateSun LLC", "Houston"),
+        ("319779", "T&K Electric Company LLC", "San Tan Valley"),
+        ("328316", "Watt Masters LLC", "Phoenix"),
+        ("310732", "Technicians for Sustainability Inc", "Tucson"),
+        ("074683", "Goodman Electric", "Flagstaff"),
+        ("332876", "EcoEnergy Solutions LLC", "Yuma"),
+        ("293690", "Liggett Electrical Services LLC", "Somerton"),
+    ]
+    for license_no, name, city in reviewed_additions:
+        rows.append({
+            "name": name, "city": city, "detail_html": badge("Active", "green"),
+            "report_url": f"reports/az/{license_no}.pdf",
+        })
+
+    rows.sort(key=lambda r: r["name"])
     conn.close()
     return rows
 

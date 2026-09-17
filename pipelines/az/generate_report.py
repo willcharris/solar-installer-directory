@@ -120,10 +120,18 @@ def load_license_context(conn, license_no: str) -> dict:
 def publishable_license_numbers(conn):
     """The same set build_site.py's load_az() shows on the live site --
     bulk generation should never produce a PDF for a business that isn't
-    even linkable from the site yet."""
+    even linkable from the site, and vice versa. This includes both the
+    is_solar_relevant=1 heuristic-caught set AND the small, individually
+    reviewed set of additional matches confirmed via matches_az.csv --
+    keep this list in sync with build_site.py's reviewed_additions."""
     cur = conn.cursor()
     cur.execute("SELECT license_no FROM licenses WHERE is_solar_relevant = 1 AND status = 'Active'")
-    return [r[0] for r in cur.fetchall()]
+    heuristic_caught = [r[0] for r in cur.fetchall()]
+    reviewed_additions = [
+        "355491", "316266", "345197", "319779", "328316",
+        "310732", "074683", "332876", "293690",
+    ]
+    return heuristic_caught + reviewed_additions
 
 
 def main():
