@@ -74,9 +74,6 @@ def load_license_context(conn, license_no: str) -> dict:
          issued_date, expiration_date, qualifying_party, status) = row
         not_in_active_roster = False
     else:
-        # Not in the active roster -- reconstruct what we can from the
-        # disciplinary ledger itself, since that's the only place this
-        # license's identity survives.
         cur.execute(
             """
             SELECT business_name, dba, city, state, license_class
@@ -93,8 +90,6 @@ def load_license_context(conn, license_no: str) -> dict:
             )
         business_name, dba, city, state, class_detail = fallback
         issued_date = expiration_date = qualifying_party = None
-        # If every disciplinary record says "Revoked" that's the clearest
-        # status to show; otherwise fall back to whatever's most recent.
         descriptions = {d["description"] for d in disciplinary_records}
         status = "Revoked" if "Revoked" in descriptions else (
             disciplinary_records[0]["description"] if disciplinary_records else "Unknown"
@@ -122,11 +117,24 @@ def load_license_context(conn, license_no: str) -> dict:
     }
 
 
+def publishable_license_numbers(conn):
+    """The same set build_site.py's load_az() shows on the live site --
+    bulk generation should never produce a PDF for a business that isn't
+    even linkable from the site yet."""
+    cur = conn.cursor()
+    cur.execute("SELECT license_no FROM licenses WHERE is_solar_relevant = 1 AND status = 'Active'")
+    return [r[0] for r in cur.fetchall()]
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--db", required=True)
-    ap.add_argument("--license", required=True, help="License number to render")
-    ap.add_argument("--out", required=True, help="Output PDF path")
+    ap.add_argument("--license", help="License number to render")
+    ap.add_argument("--out", help="Output PDF path")
+    ap.add_argument(
+        "--bulk-out",
+        help="Directory to write one PDF per publishable license (same set shown on the live site)",
+    )
     ap.add_argument(
         "--template",
         default=str(Path(__file__).parent / "report_template.html"),
@@ -134,12 +142,27 @@ def main():
     args = ap.parse_args()
 
     conn = sqlite3.connect(args.db)
-    context = load_license_context(conn, args.license)
-    conn.close()
-
     template = Template(Path(args.template).read_text(encoding="utf-8"))
-    html_content = template.render(**context)
 
+    if args.bulk_out:
+        out_dir = Path(args.bulk_out)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        license_numbers = publishable_license_numbers(conn)
+        print(f"Generating {len(license_numbers)} reports into {out_dir}/ ...")
+        for i, license_no in enumerate(license_numbers, 1):
+            context = load_license_context(conn, license_no)
+            html_content = template.render(**context)
+            HTML(string=html_content).write_pdf(out_dir / f"{license_no}.pdf")
+            if i % 50 == 0 or i == len(license_numbers):
+                print(f"  {i}/{len(license_numbers)}")
+        print(f"Done. Wrote {len(license_numbers)} PDFs to {out_dir}/")
+        return
+
+    if not args.license or not args.out:
+        ap.error("--license and --out are required (or use --bulk-out)")
+
+    context = load_license_context(conn, args.license)
+    html_content = template.render(**context)
     HTML(string=html_content).write_pdf(args.out)
     print(f"Wrote {args.out} for license {args.license} "
           f"({context['business_name']}, status: {context['status_label']})")

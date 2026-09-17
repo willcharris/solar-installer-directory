@@ -38,7 +38,9 @@
     <tbody>
         {% for row in rows %}
         <tr class="installer-row" style="border-bottom: 1px solid var(--line);">
-            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">{{ row.name }}</td>
+            <td style="padding: 9px 10px 9px 4px; font-weight: 500;">
+                {% if row.report_url %}<a href="{{ row.report_url }}" style="text-decoration: none; color: inherit; border-bottom: 1px dotted var(--accent);">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}
+            </td>
             <td style="padding: 9px 10px; color: var(--ink-soft);">{{ row.city or "" }}</td>
             <td style="padding: 9px 4px;">{{ row.detail_html | safe }}</td>
         </tr>

@@ -52,6 +52,24 @@ def list_installers(enriched_path: str):
     return names
 
 
+def high_confidence_installer_names(enriched_path: str):
+    """The same 'high confidence only' set build_site.py's load_mi() shows
+    on the live site -- bulk generation should never produce a PDF for a
+    business that isn't even linkable from the site yet."""
+    with open(enriched_path, encoding="utf-8-sig", newline="") as f:
+        names = sorted({r["candidate_name"] for r in csv.DictReader(f) if r["confidence"] == "high"})
+    return names
+
+
+def slugify(name: str) -> str:
+    """Filenames for MI use a slugified business name, not a single
+    license number -- one MI business can hold several license types,
+    so there's no single license number that identifies it the way there
+    is for AZ/TX/FL/CA."""
+    keep = "".join(c if c.isalnum() or c in " -" else "" for c in name)
+    return "-".join(keep.lower().split())
+
+
 def build_context(rows: list, installer: str) -> dict:
     if not rows:
         raise ValueError(f"No rows found for installer {installer!r} in the enriched file.")
@@ -96,6 +114,7 @@ def main():
     ap.add_argument("--installer", help="Exact candidate_name to render (see --list)")
     ap.add_argument("--out", help="Output PDF path (required unless --list)")
     ap.add_argument("--list", action="store_true", help="List installer names available and exit")
+    ap.add_argument("--bulk-out", help="Directory to write one PDF per high-confidence installer (19 currently)")
     ap.add_argument(
         "--template",
         default=str(Path(__file__).parent / "report_template.html"),
@@ -107,13 +126,28 @@ def main():
             print(name)
         return
 
+    template = Template(Path(args.template).read_text(encoding="utf-8"))
+
+    if args.bulk_out:
+        out_dir = Path(args.bulk_out)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        names = high_confidence_installer_names(args.enriched)
+        print(f"Generating {len(names)} reports into {out_dir}/ ...")
+        for i, name in enumerate(names, 1):
+            rows = load_rows(args.enriched, name)
+            context = build_context(rows, name)
+            html_content = template.render(**context)
+            HTML(string=html_content).write_pdf(out_dir / f"{slugify(name)}.pdf")
+            print(f"  {i}/{len(names)}: {name}")
+        print(f"Done. Wrote {len(names)} PDFs to {out_dir}/")
+        return
+
     if not args.installer or not args.out:
-        sys.exit("--installer and --out are required (or use --list to see names)")
+        sys.exit("--installer and --out are required (or use --list / --bulk-out)")
 
     rows = load_rows(args.enriched, args.installer)
     context = build_context(rows, args.installer)
 
-    template = Template(Path(args.template).read_text(encoding="utf-8"))
     html_content = template.render(**context)
 
     HTML(string=html_content).write_pdf(args.out)

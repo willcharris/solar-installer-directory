@@ -123,6 +123,7 @@ def main():
     ap.add_argument("--license", help="License number to render")
     ap.add_argument("--out", help="Output PDF path")
     ap.add_argument("--list", action="store_true")
+    ap.add_argument("--bulk-out", help="Directory to write one PDF per licensee (all ~617)")
     ap.add_argument("--template", default=str(Path(__file__).parent / "report_template.html"))
     args = ap.parse_args()
 
@@ -134,13 +135,28 @@ def main():
             print(f"{license_number}\t{name}\t{match_type}\t{city}")
         return
 
+    template = Template(Path(args.template).read_text(encoding="utf-8"))
+
+    if args.bulk_out:
+        out_dir = Path(args.bulk_out)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        license_numbers = [r[0] for r in list_licensees(conn)]
+        print(f"Generating {len(license_numbers)} reports into {out_dir}/ ...")
+        for i, license_number in enumerate(license_numbers, 1):
+            context = load_context(conn, license_number)
+            html_content = template.render(**context)
+            HTML(string=html_content).write_pdf(out_dir / f"{license_number}.pdf")
+            if i % 50 == 0 or i == len(license_numbers):
+                print(f"  {i}/{len(license_numbers)}")
+        print(f"Done. Wrote {len(license_numbers)} PDFs to {out_dir}/")
+        return
+
     if not args.license or not args.out:
-        ap.error("--license and --out are required (or use --list)")
+        ap.error("--license and --out are required (or use --list / --bulk-out)")
 
     context = load_context(conn, args.license)
     conn.close()
 
-    template = Template(Path(args.template).read_text(encoding="utf-8"))
     html_content = template.render(**context)
     HTML(string=html_content).write_pdf(args.out)
     print(f"Wrote {args.out} for license {args.license} "

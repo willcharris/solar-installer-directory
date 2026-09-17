@@ -105,12 +105,19 @@ def list_retailers(conn):
     return cur.fetchall()
 
 
+def all_license_numbers(conn):
+    cur = conn.cursor()
+    cur.execute("SELECT license_number FROM tx_solar_retailers")
+    return [r[0] for r in cur.fetchall()]
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--db", required=True)
     ap.add_argument("--license", help="License number to render")
     ap.add_argument("--out", help="Output PDF path")
     ap.add_argument("--list", action="store_true", help="List all retailer license numbers and exit")
+    ap.add_argument("--bulk-out", help="Directory to write one PDF per retailer (all 56)")
     ap.add_argument(
         "--template",
         default=str(Path(__file__).parent / "report_template.html"),
@@ -124,13 +131,28 @@ def main():
             print(f"{license_number}\t{business_name}\t{city}")
         return
 
+    template = Template(Path(args.template).read_text(encoding="utf-8"))
+
+    if args.bulk_out:
+        out_dir = Path(args.bulk_out)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        license_numbers = all_license_numbers(conn)
+        print(f"Generating {len(license_numbers)} reports into {out_dir}/ ...")
+        for i, license_number in enumerate(license_numbers, 1):
+            context = load_retailer_context(conn, license_number)
+            html_content = template.render(**context)
+            HTML(string=html_content).write_pdf(out_dir / f"{license_number}.pdf")
+            if i % 20 == 0 or i == len(license_numbers):
+                print(f"  {i}/{len(license_numbers)}")
+        print(f"Done. Wrote {len(license_numbers)} PDFs to {out_dir}/")
+        return
+
     if not args.license or not args.out:
-        ap.error("--license and --out are required (or use --list)")
+        ap.error("--license and --out are required (or use --list / --bulk-out)")
 
     context = load_retailer_context(conn, args.license)
     conn.close()
 
-    template = Template(Path(args.template).read_text(encoding="utf-8"))
     html_content = template.render(**context)
 
     HTML(string=html_content).write_pdf(args.out)

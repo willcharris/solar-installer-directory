@@ -43,6 +43,13 @@ def _title_city(city: str) -> str:
     return (city or "").title()
 
 
+def _slugify(name: str) -> str:
+    """Same slugification as MI's generate_report.py --bulk-out -- must
+    match exactly, or site links point at filenames that don't exist."""
+    keep = "".join(c if c.isalnum() or c in " -" else "" for c in name)
+    return "-".join(keep.lower().split())
+
+
 def badge(label: str, kind: str) -> str:
     return f'<span class="badge badge-{kind}">{label}</span>'
 
@@ -52,11 +59,14 @@ def load_az(db_path: str) -> list[dict]:
     conn.row_factory = sqlite3.Row
     rows = []
     for r in conn.execute(
-        "SELECT business_name, dba, city, status FROM licenses "
+        "SELECT license_no, business_name, dba, city, status FROM licenses "
         "WHERE is_solar_relevant = 1 AND status = 'Active' ORDER BY business_name"
     ):
         name = r["dba"] or r["business_name"]
-        rows.append({"name": name, "city": _title_city(r["city"]), "detail_html": badge("Active", "green")})
+        rows.append({
+            "name": name, "city": _title_city(r["city"]), "detail_html": badge("Active", "green"),
+            "report_url": f"reports/az/{r['license_no']}.pdf",
+        })
     conn.close()
     return rows
 
@@ -67,7 +77,7 @@ def load_tx(db_path: str) -> list[dict]:
     rows = []
     for r in conn.execute(
         """
-        SELECT t.business_name, t.city, s.status FROM tx_solar_retailers t
+        SELECT t.license_number, t.business_name, t.city, s.status FROM tx_solar_retailers t
         LEFT JOIN (
             SELECT license_number, status,
                    ROW_NUMBER() OVER (PARTITION BY license_number ORDER BY scraped_at DESC) rn
@@ -78,7 +88,10 @@ def load_tx(db_path: str) -> list[dict]:
     ):
         status = r["status"] or "Unknown"
         kind = "green" if status == "Current" else "neutral"
-        rows.append({"name": r["business_name"], "city": _title_city(r["city"]), "detail_html": badge(status, kind)})
+        rows.append({
+            "name": r["business_name"], "city": _title_city(r["city"]), "detail_html": badge(status, kind),
+            "report_url": f"reports/tx/{r['license_number']}.pdf",
+        })
     conn.close()
     return rows
 
@@ -91,7 +104,7 @@ def load_fl(db_path: str) -> list[dict]:
     conn.row_factory = sqlite3.Row
     rows = []
     for r in conn.execute(
-        "SELECT licensee_name, dba_name, city, primary_status, secondary_status, match_type "
+        "SELECT license_number, licensee_name, dba_name, city, primary_status, secondary_status, match_type "
         "FROM fl_solar_licensees ORDER BY dba_name, licensee_name"
     ):
         name = (r["dba_name"] or "").strip() or r["licensee_name"]
@@ -103,7 +116,10 @@ def load_fl(db_path: str) -> list[dict]:
         detail = badge(label, kind)
         if r["match_type"] == "EC name-matched":
             detail += ' <span style="font-size:0.75rem;color:var(--ink-soft);">(EC, name-matched)</span>'
-        rows.append({"name": name, "city": _title_city(r["city"]), "detail_html": detail})
+        rows.append({
+            "name": name, "city": _title_city(r["city"]), "detail_html": detail,
+            "report_url": f"reports/fl/{r['license_number']}.pdf",
+        })
     conn.close()
     return rows
 
@@ -113,13 +129,16 @@ def load_ca(db_path: str) -> list[dict]:
     conn.row_factory = sqlite3.Row
     rows = []
     for r in conn.execute(
-        "SELECT business_name, city, expiration_date FROM licenses ORDER BY business_name"
+        "SELECT license_number, business_name, city, expiration_date FROM licenses ORDER BY business_name"
     ):
         exp = r["expiration_date"] or "not available"
         # No status field exists in this data -- show expiration only,
         # never an invented Active/Expired badge.
         detail = f'<span style="color:var(--ink-soft);font-size:0.85rem;">Expires {exp}</span>'
-        rows.append({"name": r["business_name"], "city": _title_city(r["city"]), "detail_html": detail})
+        rows.append({
+            "name": r["business_name"], "city": _title_city(r["city"]), "detail_html": detail,
+            "report_url": f"reports/ca/{r['license_number']}.pdf",
+        })
     conn.close()
     return rows
 
@@ -140,7 +159,10 @@ def load_mi(enriched_csv_path: str) -> list[dict]:
             kind = "green" if status == "Issued" else ("amber" if status in ("Inactive",) else "red")
             short_type = r["license_type"].replace("Residential Builder", "RB").replace(" Company", "")
             badges.append(badge(f"{short_type}: {status}", kind))
-        rows.append({"name": name, "city": _title_city(recs[0].get("license_city", "")), "detail_html": " ".join(badges)})
+        rows.append({
+            "name": name, "city": _title_city(recs[0].get("license_city", "")), "detail_html": " ".join(badges),
+            "report_url": f"reports/mi/{_slugify(name)}.pdf",
+        })
     return rows
 
 
