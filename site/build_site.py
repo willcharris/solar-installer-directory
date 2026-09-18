@@ -14,9 +14,10 @@ forced across five very different data sources. Specifically:
         Sales-registration only; see the framing text on that page.
   FL  - CVC (dedicated solar classification) + EC name-matched rows,
         each labeled which is which in the table itself.
-  CA  - complete dedicated C-46 registry. No status field exists in
-        this data at all -- shows expiration date only, no invented
-        Active/Expired badge.
+  CA  - complete dedicated C-46 registry, now with real status data
+        from CSLB's statewide License Master file, plus a small set of
+        manually-reviewed additions found under other classifications
+        (C-10, B) via fuzzy-matching -- the same fix applied to AZ/FL.
   MI  - fully individually-verified curated set (19 businesses), the
         smallest and most manually-checked of the five.
 
@@ -168,19 +169,37 @@ def load_fl(db_path: str) -> list[dict]:
     return rows
 
 
+def _ca_classify_status(primary: str, secondary: str):
+    """Same logic as scraper/generate_report.py's classify_status --
+    keep these two in sync. Only PRIMARY status triggers a red
+    Suspended badge; a secondary flag containing "Susp" (e.g. "WC Susp
+    Pending") describes a suspension that is pending, not yet in
+    effect, and must not be shown as an active suspension."""
+    primary = (primary or "").strip()
+    secondary = (secondary or "").strip()
+    if "Susp" in primary:
+        return f"Suspended ({primary})", "red"
+    if primary == "CLEAR" and not secondary:
+        return "Active", "green"
+    if primary == "CLEAR" and secondary:
+        readable = "; ".join(s.strip() for s in secondary.split("|") if s.strip())
+        return readable, "amber"
+    if not primary:
+        return "Unknown", "neutral"
+    return f"{primary}" + (f" / {secondary}" if secondary else ""), "neutral"
+
+
 def load_ca(db_path: str) -> list[dict]:
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     rows = []
     for r in conn.execute(
-        "SELECT license_number, business_name, city, expiration_date FROM licenses ORDER BY business_name"
+        "SELECT license_number, business_name, city, primary_status, secondary_status "
+        "FROM licenses ORDER BY business_name"
     ):
-        exp = r["expiration_date"] or "not available"
-        # No status field exists in this data -- show expiration only,
-        # never an invented Active/Expired badge.
-        detail = f'<span style="color:var(--ink-soft);font-size:0.85rem;">Expires {exp}</span>'
+        label, kind = _ca_classify_status(r["primary_status"], r["secondary_status"])
         rows.append({
-            "name": r["business_name"], "city": _title_city(r["city"]), "detail_html": detail,
+            "name": r["business_name"], "city": _title_city(r["city"]), "detail_html": badge(label, kind),
             "report_url": f"reports/ca/{r['license_number']}.pdf",
         })
     conn.close()
@@ -253,14 +272,16 @@ STATE_LOADERS = {
     "ca": {
         "name": "California", "loader": load_ca, "complete": True,
         "framing": (
-            "California's C-46 Solar Contractor classification is dedicated and well established. "
-            "This data does not currently include a status field — expiration date is shown instead "
-            "of an Active/Expired label, since asserting one without the underlying field would be a "
-            "claim this site cannot actually back up. Disciplinary records have not yet been "
-            "populated for California."
+            "California's C-46 Solar Contractor classification is dedicated and well established, "
+            "shown here with real license status (Active/Suspended/flagged) from CSLB's own records — "
+            "including a small number of businesses added after being found licensed under a related "
+            "classification (C-10 Electrical or B General Building) instead of C-46 itself, the same "
+            "gap found and fixed for Arizona and Florida. Complaint- and case-level disciplinary detail "
+            "has not yet been loaded for California; the status shown is CSLB's own license standing, "
+            "not a complaint history."
         ),
-        "source_name": "California CSLB C-46 license roster",
-        "blurb": "Dedicated C-46 solar classification — status field not yet available in this data.",
+        "source_name": "California CSLB statewide License Master file",
+        "blurb": "Dedicated C-46 solar classification, with real license status and a few name-matched additions.",
     },
     "mi": {
         "name": "Michigan", "loader": load_mi, "complete": False,

@@ -1,28 +1,22 @@
 #!/usr/bin/env python3
 """
 Generate a one-page installer verification PDF for a California CSLB
-license, pulling from cslb_solar.db.
+license, pulling from cslb_solar.db (built by ingest_master.py from
+CSLB's statewide License Master file).
 
-Two things specific to California's data:
-
-1. NO STATUS FIELD EXISTS. The `licenses` table has issue_date and
-   expiration_date but nothing else -- no Active/Expired/Suspended
-   field the way AZ, TX, and FL all have. This report shows expiration
-   date plainly and does NOT compute a guessed Active/Expired label
-   from it -- a license past its printed expiration date could still
-   be in a renewal grace period, and one within date could have been
-   separately suspended. Asserting a status this data doesn't actually
-   contain would be a claim this report can't back up.
-
-2. DISCIPLINARY DATA HAS NEVER BEEN POPULATED. The `disciplinary_actions`
-   table exists structurally (same schema shape as AZ's) but has zero
-   rows across the entire database -- not because CA licensees are
-   clean, but because no one has loaded real CSLB disciplinary data
-   into it yet. The query below is written correctly so that if real
-   data is loaded later this report will pick it up automatically
-   without needing any code changes -- but as of this writing, every
-   single report will hit the "not yet sourced" branch, and that branch
-   says so honestly rather than claiming a clean record.
+STATUS: this data has real PrimaryStatus/SecondaryStatus fields (an
+earlier version of this pipeline used a data source that lacked status
+entirely -- that limitation is gone now that ingest_master.py loads
+the full statewide file). Verified against the real distinct values in
+this data (not guessed):
+  - PrimaryStatus "CLEAR" with no secondary flag -> Active (the vast
+    majority, 1,099 of 1,192 C-46 licenses)
+  - PrimaryStatus "CLEAR" WITH a secondary flag (e.g. "Pending Case/CIT",
+    "7073E Probation", "WC Susp Pending") -> shown as flagged, not a
+    plain "Active" badge -- a pending suspension or probation status
+    riding on an otherwise-clear primary status is exactly the kind of
+    thing this report exists to surface, not hide.
+  - PrimaryStatus containing "Susp" -> Suspended
 
 Also shown: every classification this license actually holds (from the
 license_classifications join table), not just C-46. A licensed solar
@@ -30,6 +24,11 @@ contractor commonly also holds C-10 (Electrical) or B (General
 Building) -- showing the full set is directly relevant to this
 project's whole premise that a single classification label doesn't
 tell the full story.
+
+DISCIPLINARY DATA: the disciplinary_actions table (complaint-level
+detail, case numbers) has not been populated -- the status flags above
+are real, but a complaint/case-history source is a separate, still-open
+gap. The report says so honestly rather than implying a full check.
 
 Usage:
     python generate_report.py --db cslb_solar.db --license 123456 --out report.pdf
@@ -44,14 +43,41 @@ from jinja2 import Template
 from weasyprint import HTML
 
 CLASSIFICATION_LABELS = {
-    "C46": "C-46 (Solar)",
-    "C10": "C-10 (Electrical)",
+    "C-46": "C-46 (Solar)",
+    "C-10": "C-10 (Electrical)",
     "B": "B (General Building)",
-    "C20": "C-20 (HVAC)",
-    "C39": "C-39 (Roofing)",
-    "C36": "C-36 (Plumbing)",
+    "C-20": "C-20 (HVAC)",
+    "C-39": "C-39 (Roofing)",
+    "C-36": "C-36 (Plumbing)",
     "A": "A (General Engineering)",
 }
+
+
+def classify_status(primary: str, secondary: str):
+    """Returns (label, css_class). Based on the real confirmed value
+    distribution -- see module docstring.
+
+    IMPORTANT: only PRIMARY status is checked for an actual suspension.
+    Real confirmed data shows genuine suspensions always appear as the
+    primary value ("Contr Bond Susp", "Work Comp Susp", etc.). A
+    SECONDARY flag containing "Susp" (e.g. "WC Susp Pending") describes
+    a suspension that is pending, not yet in effect -- treating that as
+    an active "Suspended" label would overstate what CSLB is actually
+    saying, which is exactly the kind of false claim this report exists
+    to avoid making.
+    """
+    primary = (primary or "").strip()
+    secondary = (secondary or "").strip()
+    if "Susp" in primary:
+        return f"Suspended ({primary})", "suspended"
+    if primary == "CLEAR" and not secondary:
+        return "Active", "active"
+    if primary == "CLEAR" and secondary:
+        readable = "; ".join(s.strip() for s in secondary.split("|") if s.strip())
+        return readable, "flagged"
+    if not primary:
+        return "Unknown", "unknown"
+    return f"{primary}" + (f" / {secondary}" if secondary else ""), "unknown"
 
 
 def load_context(conn, license_number: str) -> dict:
@@ -59,7 +85,8 @@ def load_context(conn, license_number: str) -> dict:
     cur.execute(
         """
         SELECT license_number, business_name, address, city, state, zip_code,
-               county, phone_number, issue_date, expiration_date, qualifier_name
+               county, phone_number, issue_date, expiration_date, qualifier_name,
+               primary_status, secondary_status
         FROM licenses WHERE license_number = ?
         """,
         (license_number,),
@@ -69,7 +96,10 @@ def load_context(conn, license_number: str) -> dict:
         raise ValueError(f"License {license_number!r} not found in licenses.")
 
     (license_number, business_name, address, city, state, zip_code,
-     county, phone_number, issue_date, expiration_date, qualifier_name) = row
+     county, phone_number, issue_date, expiration_date, qualifier_name,
+     primary_status, secondary_status) = row
+
+    status_label, status_class = classify_status(primary_status, secondary_status)
 
     cur.execute(
         "SELECT classification_code FROM license_classifications WHERE license_number = ? ORDER BY classification_code",
@@ -96,6 +126,8 @@ def load_context(conn, license_number: str) -> dict:
         "issue_date": issue_date or "Not available",
         "expiration_date": expiration_date or "Not available",
         "qualifier_name": qualifier_name or "Not listed",
+        "status_label": status_label,
+        "status_class": status_class,
         "classifications": classifications,
         "disciplinary_records": disciplinary_records,
     }

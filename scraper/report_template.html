@@ -95,6 +95,20 @@
     }
     .not-sourced-box .flag-title { font-weight: 700; margin-bottom: 2px; }
 
+    .status-badge {
+        display: inline-block;
+        padding: 4px 14px;
+        border-radius: 3px;
+        font-weight: 700;
+        font-size: 10pt;
+        letter-spacing: 0.03em;
+        margin-top: 6px;
+    }
+    .status-active { background: #e6f4ea; color: #1e7e34; border: 1px solid #1e7e34; }
+    .status-suspended { background: #fdecea; color: #a11d1d; border: 1px solid #a11d1d; }
+    .status-flagged { background: #fff4e0; color: #a15c00; border: 1px solid #a15c00; }
+    .status-unknown { background: #eef0f3; color: #4b5563; border: 1px solid #9ca3af; }
+
     .source-note {
         margin-top: 14px; padding-top: 8px; border-top: 1px solid #d1d5db;
         font-size: 7.8pt; color: #6b7280;
@@ -109,6 +123,7 @@
     <div class="classification-row">
         {% for c in classifications %}<span class="classification-chip">{{ c }}</span>{% endfor %}
     </div>
+    <div><span class="status-badge status-{{ status_class }}">{{ status_label }}</span></div>
 </div>
 
 <div class="grid">
@@ -131,11 +146,10 @@
 </div>
 
 <div class="scope-box">
-    <div class="flag-title">On license status</div>
-    California's data for this license does not include a separate status field (Active/Expired/
-    Suspended). The expiration date above is shown as published — it is not a substitute for
-    confirming current standing directly with CSLB, since a license can be renewed, suspended, or
-    revoked independently of the date printed here.
+    <div class="flag-title">On the status shown above</div>
+    This status comes directly from CSLB's own PrimaryStatus/SecondaryStatus fields. It is not a
+    substitute for confirming current standing directly with CSLB, since status can change at any
+    time after this data was retrieved.
 </div>
 
 <div class="section-title">Disciplinary Actions &amp; Complaints</div>
@@ -148,17 +162,19 @@
     {% endfor %}
 {% else %}
 <div class="not-sourced-box">
-    <div class="flag-title">Not yet available for California</div>
-    This directory has not yet loaded CSLB disciplinary or complaint data for California. The absence
-    of flags here means this hasn't been checked yet — it is not a claim that this business has a
-    clean record.
+    <div class="flag-title">Complaint-level detail not yet available for California</div>
+    License status above (Active/Suspended/flagged) comes directly from CSLB. This directory has not
+    yet loaded CSLB's separate complaint- or case-level disciplinary detail (individual complaint
+    numbers, dispositions). The absence of records here means that hasn't been checked yet — it is
+    not a claim that this business has no history beyond what's shown above.
 </div>
 {% endif %}
 
 <div class="source-note">
-    License data sourced from the California Contractors State License Board (CSLB) public C-46
-    Solar Contractor roster. This report reflects what CSLB had on file as of the retrieval date and
-    is not a substitute for confirming a contractor's current status directly with CSLB before hiring.
+    License data sourced from the California Contractors State License Board (CSLB) statewide License
+    Master file (public Data Portal). This report reflects what CSLB had on file as of the retrieval
+    date and is not a substitute for confirming a contractor's current status directly with CSLB
+    before hiring.
 </div>
 
 </body>
