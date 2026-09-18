@@ -150,6 +150,20 @@ def load_fl(db_path: str) -> list[dict]:
             "name": name, "city": _title_city(r["city"]), "detail_html": detail,
             "report_url": f"reports/fl/{r['license_number']}.pdf",
         })
+
+    # Note: LUNEX POWER INC. (license 13014194) was manually reviewed and
+    # added via the fuzzy-matching pass against FL's full EC roster (the
+    # same fix already applied to AZ) -- it's inserted directly into the
+    # fl_solar_licensees table (not appended here) so it flows through
+    # this same query automatically. Of 5 unique high-confidence
+    # candidates from that pass, only this one held up under review --
+    # the other 4 (Tampa Bay Solar, Public Service Solar LLC, Coast To
+    # Coast Solar, Coastal Energy) each matched an unrelated company that
+    # happens to share a generic regional/civic name ("Tampa Bay", "Coast
+    # to Coast", "Public Service") -- confirmed independently for at
+    # least Tampa Bay Electric Inc via Florida's Sunbiz registry. Do not
+    # add those without separately re-verifying each one.
+
     conn.close()
     return rows
 

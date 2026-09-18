@@ -76,6 +76,26 @@ CREATE TABLE IF NOT EXISTS fl_solar_licensees (
     discipline_note TEXT,              -- explicit gap flag for EC rows (see module docstring)
     PRIMARY KEY (license_number, match_type)
 );
+
+-- The FULL Electrical Contractor roster (all ~19,700 rows), not just the
+-- SOLAR_NAME_HINTS-filtered subset above. This exists specifically so a
+-- future fuzzy-matching pass (the same fix already applied to AZ) can
+-- check real candidate installer names against every EC licensee, not
+-- just the ones that already happen to say "solar" in their name --
+-- which is precisely the gap that heuristic can't catch on its own.
+CREATE TABLE IF NOT EXISTS fl_electrical_contractors_all (
+    license_number TEXT PRIMARY KEY,
+    licensee_name TEXT,
+    dba_name TEXT,
+    city TEXT,
+    state TEXT,
+    zip TEXT,
+    county_code TEXT,
+    primary_status TEXT,
+    secondary_status TEXT,
+    orig_licensure_date TEXT,
+    expiration_date TEXT
+);
 """
 
 
@@ -173,6 +193,18 @@ def main():
     print(f"\nSTEP 5: writing {args.db}")
     conn = sqlite3.connect(args.db)
     conn.executescript(SCHEMA)
+
+    # Persist the FULL EC roster (not just the name-hits subset) so a
+    # future fuzzy-matching pass has something to check real candidate
+    # names against -- see the schema comment above.
+    elec_full = elec.rename(columns={"zip": "zip"})[
+        ["license_number", "licensee_name", "dba_name", "city", "state", "zip",
+         "county_code", "primary_status", "secondary_status", "orig_licensure_date",
+         "expiration_date"]
+    ]
+    elec_full.to_sql("fl_electrical_contractors_all", conn, if_exists="replace", index=False)
+    print(f"  wrote {len(elec_full):,} rows to fl_electrical_contractors_all (full EC roster)")
+
     cols = [
         "license_number", "licensee_name", "dba_name", "occupation_code", "class_code",
         "city", "state", "zip", "county_code", "primary_status", "secondary_status",

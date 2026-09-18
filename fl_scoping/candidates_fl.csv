@@ -1,0 +1,45 @@
+business_name,city,source,notes
+PRIME Green Solutions,Orlando,EnergySage,No "solar"/"PV"/"photovoltaic" in name -- EnergySage-ranked, real heuristic-miss test case
+Lunex Power,Tampa,EnergySage+Places,No "solar" in name -- reviews confirm full solar+battery installs; EnergySage-ranked
+Castaways Energy & Roofing,Orlando,Places,No "solar" in name -- reviews confirm solar and storage system installs
+Affordable Solar Roof & Air,Clearwater,EnergySage+Places,Has "Solar" in name -- likely already caught by heuristic
+Goldin Solar,Multi-city FL,EnergySage,Has "Solar" in name
+Sunlight Solar,Multi-city FL,EnergySage,Has "Solar" in name
+Palmetto Energy,Multi-city FL,EnergySage,No "solar" in name -- national brand, verify FL-registered entity name
+Sprightful Solar,Miami,EnergySage,Has "Solar" in name
+PayOli Solar,Miami,EnergySage,Has "Solar" in name
+Fuze Inc D/B/A Fused Solar and Roofing,Tampa,EnergySage,Legal name "Fuze Inc" has no "solar" -- DBA does; good test of licensee_name vs dba_name matching
+Aspire Solar,Multi-city FL,EnergySage,Has "Solar" in name
+Tampa Bay Solar,Tampa,EnergySage+Places,Has "Solar" in name
+Public Service Solar LLC,Multi-city FL,EnergySage,Has "Solar" in name
+Stilwell Solar,Fort Myers,EnergySage+Places,Has "Solar" in name
+Transform Solar,Tampa,EnergySage+Places,Has "Solar" in name
+SunVena Solar,Sanford,Places,Has "Solar" in name
+Sunbright Solar,Orlando,Places,Has "Solar" in name
+Spartan Solar,Winter Park,Places,Has "Solar" in name
+Switch Solar LLC,Orlando,Places,Has "Solar" in name
+Solaria Solar and Roofing,Orlando,Places,Has "Solar" in name
+Radiant Energy and Solar,Orlando,Places,Has "Solar" in name
+Solar Central LLC,Orlando,Places,Has "Solar" in name
+Florida Electric & Solar,Tampa,Places,Has "Solar" in name
+Freedom Power,Tampa,Places,No "solar" in name -- reviews call it "Freedom Solar" informally; real heuristic-miss test case
+Coast To Coast Solar,Lutz,Places,Has "Solar" in name; note -- mixed reviews on pool-solar warranty follow-through
+Synergy Solar and Roofing,Jacksonville,Places,Has "Solar" in name
+A1A Solar & Air,Jacksonville,Places,Has "Solar" in name
+Masterpiece Solar,Jacksonville,Places,Has "Solar" in name
+Sunpath Solar LLC,Jacksonville,Places,Has "Solar" in name
+Solar Energy Labs,Jacksonville,Places,Has "Solar" in name
+SunRay Solar Solutions,Jacksonville,Places,Has "Solar" in name
+Florida Solar Design Group,Fort Myers,Places,Has "Solar" in name
+Momentum Solar Fort Myers,Fort Myers,Places,Has "Solar" in name; national brand -- verify FL-registered legal name; mixed reviews (door-to-door sales complaints)
+Green City Solar LLC,North Fort Myers,Places,Has "Solar" in name
+Solar Energy Solutions of America Inc.,Cape Coral,Places,Has "Solar" in name
+Advance Solar & Spa,Fort Myers,Places,Has "Solar" in name
+Solar First,Fort Myers,Places,Has "Solar" in name
+Coastal Energy,"Fort Myers / Ocala",Places,No "solar" in name -- reviews confirm solar+battery installs and Tesla Powerwall work; real heuristic-miss test case
+IGT Solar - Independent Green Technologies,Tallahassee,Places,Display name has "Solar" but legal name may be "Independent Green Technologies" -- verify licensee_name vs dba_name
+Simpler Solar Systems,Tallahassee,Places,Has "Solar" in name
+Genesis Solar Systems,Tallahassee,Places,Has "Solar" in name; appears focused on panel cleaning/maintenance -- verify installer vs service-only scope
+EcoGen America,Tallahassee,Places,No "solar" in name -- reviews confirm solar panel installs; low review count (2), lower confidence
+Vertical Solar Systems,Tallahassee,Places,Has "Solar" in name; no reviews yet -- low confidence
+Elek Energy,Tallahassee,Places,No "solar"/"PV" in name -- reviews describe net-metering/bill-reduction work consistent with solar sales; real heuristic-miss test case

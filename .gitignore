@@ -18,3 +18,6 @@ fl_scoping/*.pdf
 fl_scoping/fl_solar_out/
 fl_scoping/*.db
 scraper/test_report.pdf
+fl_scoping/matches_fl.csv
+fl_scoping/matches_fl_test.csv
+fl_scoping/candidates_fl_test.csv
