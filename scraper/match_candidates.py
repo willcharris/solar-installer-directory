@@ -11,20 +11,28 @@ database write. You look it over, then step 2 (`load` mode) loads only the
 rows you've confirmed.
 
 Usage:
-    # Step 1: generate a review file
+    # Step 1: generate a review file (one or more exports at once --
+    # CSLB's Data Portal caps a single download at 10 counties, so
+    # covering all 58 CA counties for C-10 + B takes 6 export files,
+    # not one; this script merges them into a single review pass)
     python match_candidates.py match \
         --candidates candidates.csv \
-        --export scraper/exports/CSLBSearchData_101620438.xlsx \
-        --out review_fresno_c10.csv
+        --export scraper/exports/CSLBSearchData_group1.xlsx \
+        --export scraper/exports/CSLBSearchData_group2.xlsx \
+        --export scraper/exports/CSLBSearchData_group3.xlsx \
+        --out review_ca_statewide.csv
 
-    # ... open review_fresno_c10.csv, check the "confirm" column for anything
-    #     you want loaded, mark it "y" (rows already marked "y" by the
-    #     auto-confidence threshold are pre-filled but still worth a glance) ...
+    # ... open review_ca_statewide.csv, check the "confirm" column for
+    #     anything you want loaded, mark it "y" ...
 
-    # Step 2: load only the confirmed rows into the database
+    # Step 2: load only the confirmed rows into the database (pass every
+    # export file used in step 1 -- a confirmed license number could be
+    # in any of them)
     python match_candidates.py load \
-        --review review_fresno_c10.csv \
-        --export scraper/exports/CSLBSearchData_101620438.xlsx \
+        --review review_ca_statewide.csv \
+        --export scraper/exports/CSLBSearchData_group1.xlsx \
+        --export scraper/exports/CSLBSearchData_group2.xlsx \
+        --export scraper/exports/CSLBSearchData_group3.xlsx \
         --source-classification C-10
 
 candidates.csv format (one row per candidate business, from Google Places or
@@ -69,14 +77,31 @@ def normalize(name: str) -> str:
     return name
 
 
+def load_exports(export_paths: list) -> pd.DataFrame:
+    """Load and concatenate one or more CSLB export files, dropping any
+    duplicate license numbers that appear in more than one file (can
+    happen at the edges of a county grouping)."""
+    frames = []
+    for path in export_paths:
+        df = pd.read_excel(path, dtype=str)
+        df['norm_name'] = df['BusinessName'].apply(normalize)
+        frames.append(df)
+    combined = pd.concat(frames, ignore_index=True)
+    before = len(combined)
+    combined = combined.drop_duplicates(subset='LicenseNumber', keep='first')
+    if len(combined) < before:
+        print(f"  ({before - len(combined)} duplicate license number(s) across export files, deduplicated)")
+    return combined
+
+
 # ---------------------------------------------------------------------------
 # MATCH MODE
 # ---------------------------------------------------------------------------
 
-def run_match(candidates_path: str, export_path: str, out_path: str) -> None:
+def run_match(candidates_path: str, export_paths: list, out_path: str) -> None:
     candidates = pd.read_csv(candidates_path)
-    export = pd.read_excel(export_path, dtype=str)
-    export['norm_name'] = export['BusinessName'].apply(normalize)
+    export = load_exports(export_paths)
+    print(f"Loaded {len(export):,} total license records across {len(export_paths)} export file(s)")
 
     rows = []
     for _, cand in candidates.iterrows():
@@ -119,7 +144,7 @@ def run_match(candidates_path: str, export_path: str, out_path: str) -> None:
 # LOAD MODE
 # ---------------------------------------------------------------------------
 
-def run_load(review_path: str, export_path: str, source_classification: str) -> None:
+def run_load(review_path: str, export_paths: list, source_classification: str) -> None:
     review = pd.read_csv(review_path, dtype=str)
     confirmed = review[review['confirm'].str.lower() == 'y']
 
@@ -127,7 +152,7 @@ def run_load(review_path: str, export_path: str, source_classification: str) -> 
         print("No rows marked confirm='y' in the review file — nothing to load.")
         return
 
-    export = pd.read_excel(export_path, dtype=str)
+    export = load_exports(export_paths)
     confirmed_license_numbers = set(confirmed['matched_license_number'].astype(str))
     matched_rows = export[export['LicenseNumber'].astype(str).isin(confirmed_license_numbers)]
 
@@ -152,12 +177,14 @@ def main():
 
     match_p = sub.add_parser('match', help='Generate a review CSV of candidate matches')
     match_p.add_argument('--candidates', required=True, help='CSV of candidate businesses (name, address)')
-    match_p.add_argument('--export', required=True, help='CSLB Data Portal export .xlsx (C-10 or B, one county)')
+    match_p.add_argument('--export', required=True, action='append',
+                          help='CSLB Data Portal export .xlsx -- repeat this flag once per file (up to 10 counties per CSLB export, so statewide C-10+B needs about 6 files)')
     match_p.add_argument('--out', required=True, help='Where to write the review CSV')
 
     load_p = sub.add_parser('load', help='Load confirmed matches from a reviewed CSV into the database')
     load_p.add_argument('--review', required=True, help='The review CSV, with confirm column filled in')
-    load_p.add_argument('--export', required=True, help='The same .xlsx export used to generate the review CSV')
+    load_p.add_argument('--export', required=True, action='append',
+                         help='Same export file(s) used to generate the review CSV -- repeat once per file')
     load_p.add_argument('--source-classification', required=True, help='e.g. C-10 or B, for the log message only')
 
     args = parser.parse_args()
