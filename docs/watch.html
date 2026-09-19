@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Get notified — Solar Installer Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --ink: #1f2430; --ink-soft: #4b5563; --paper: #f7f6f3; --paper-panel: #ffffff;
+        --line: #d9d5cd; --accent: #2563a8; --accent-soft: #eaf2fb;
+        --serif: "Source Serif 4", Georgia, serif;
+        --sans: "Public Sans", -apple-system, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0; font-family: var(--sans); color: var(--ink); background: var(--paper); line-height: 1.55;
+    }
+    .site-header {
+        border-bottom: 1px solid var(--line); background: var(--paper-panel);
+    }
+    .site-header-inner {
+        max-width: 640px; margin: 0 auto; padding: 18px 24px;
+    }
+    .wordmark {
+        font-family: var(--serif); font-weight: 600; font-size: 1.25rem; text-decoration: none; color: var(--ink);
+    }
+    .wordmark span { color: var(--accent); }
+    main { max-width: 640px; margin: 0 auto; padding: 48px 24px 80px 24px; }
+    h1 { font-family: var(--serif); font-weight: 600; font-size: 1.7rem; margin-bottom: 6px; }
+    .installer-name { color: var(--accent); }
+    .lede { color: var(--ink-soft); margin-bottom: 28px; }
+    .card {
+        background: var(--paper-panel); border: 1px solid var(--line); border-radius: 4px; padding: 24px;
+    }
+    label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
+    input[type="email"] {
+        width: 100%; padding: 12px 14px; font-size: 1rem; font-family: var(--sans);
+        border: 1px solid var(--line); border-radius: 3px; margin-bottom: 16px;
+    }
+    button {
+        background: var(--accent); color: white; border: none; padding: 14px 24px;
+        font-size: 1rem; font-weight: 600; border-radius: 3px; cursor: pointer; font-family: var(--sans);
+        line-height: 1.2; display: inline-block;
+    }
+    button:hover { opacity: 0.9; }
+    .fine-print { font-size: 0.8rem; color: var(--ink-soft); margin-top: 16px; }
+    .no-installer-note {
+        background: var(--accent-soft); border: 1px solid #b9d3f0; border-radius: 4px;
+        padding: 14px 18px; font-size: 0.9rem; color: #1f3a5c; margin-bottom: 20px;
+    }
+    #success-message {
+        display: none; background: #e6f4ea; border: 1px solid #b6ddc0; border-radius: 4px;
+        padding: 20px; color: #285e38;
+    }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+    <div class="site-header-inner">
+        <a class="wordmark" href="index.html">Check<span>Before</span>YouSign</a>
+    </div>
+</header>
+
+<main>
+    <h1>Get notified if <span class="installer-name" id="installer-name-heading">this installer</span>'s status changes</h1>
+    <p class="lede" id="installer-context">
+        We'll email you if this business's license status changes — suspended, revoked, or dropped
+        from the active roster.
+    </p>
+
+    <div id="no-installer-note" class="no-installer-note" style="display:none;">
+        This page is meant to be opened from a specific installer's listing so we know which one to
+        watch. If you got here directly, go back to the <a href="index.html">directory</a> and click
+        "Get notified" next to the installer you're interested in.
+    </div>
+
+    <div class="card" id="form-card">
+        <form id="watch-form" action="https://formspree.io/f/mvkgzzwa" method="POST">
+            <input type="hidden" name="installer_name" id="field-installer-name">
+            <input type="hidden" name="license_number" id="field-license-number">
+            <input type="hidden" name="state" id="field-state">
+            <label for="email">Your email</label>
+            <input type="email" id="email" name="email" required placeholder="you@example.com">
+            <button type="submit">Notify me</button>
+            <p class="fine-print">
+                This is a manual, early-stage service run by one person — not an automated alert
+                system yet. We're testing whether this is useful before building it out further.
+            </p>
+        </form>
+    </div>
+
+    <div id="success-message">
+        <strong>Thanks — you're on the list.</strong> We'll reach out if this installer's status changes.
+    </div>
+</main>
+
+<script>
+(function () {
+    const params = new URLSearchParams(window.location.search);
+    const installer = params.get('installer');
+    const license = params.get('license');
+    const state = params.get('state');
+
+    if (!installer) {
+        document.getElementById('no-installer-note').style.display = 'block';
+        document.getElementById('form-card').style.display = 'none';
+        return;
+    }
+
+    document.getElementById('installer-name-heading').textContent = installer;
+    document.title = `Get notified — ${installer}`;
+    document.getElementById('field-installer-name').value = installer;
+    document.getElementById('field-license-number').value = license || '';
+    document.getElementById('field-state').value = state || '';
+
+    const form = document.getElementById('watch-form');
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const data = new FormData(form);
+        fetch(form.action, {
+            method: 'POST',
+            body: data,
+            headers: { 'Accept': 'application/json' }
+        }).then(response => {
+            if (response.ok) {
+                document.getElementById('form-card').style.display = 'none';
+                document.getElementById('success-message').style.display = 'block';
+            } else {
+                alert('Something went wrong submitting the form. Please try again.');
+            }
+        }).catch(() => {
+            alert('Something went wrong submitting the form. Please try again.');
+        });
+    });
+})();
+</script>
+
+</body>
+</html>

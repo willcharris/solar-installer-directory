@@ -33,6 +33,7 @@
             <th style="text-align: left; padding: 8px 10px 8px 4px;">Business</th>
             <th style="text-align: left; padding: 8px 10px;">City</th>
             <th style="text-align: left; padding: 8px 4px;">Status</th>
+            <th style="text-align: left; padding: 8px 4px;"></th>
         </tr>
     </thead>
     <tbody>
@@ -43,6 +44,12 @@
             </td>
             <td style="padding: 9px 10px; color: var(--ink-soft);">{{ row.city or "" }}</td>
             <td style="padding: 9px 4px;">{{ row.detail_html | safe }}</td>
+            <td style="padding: 9px 4px; white-space: nowrap;">
+                <a href="{{ root }}watch.html?installer={{ row.name | urlencode }}&license={{ (row.report_url.split('/')[-1].rsplit('.', 1)[0]) | urlencode }}&state={{ state_slug }}"
+                   style="font-size: 0.78rem; color: var(--accent); text-decoration: none; border: 1px solid var(--accent); border-radius: 3px; padding: 3px 8px; white-space: nowrap;">
+                    Get notified
+                </a>
+            </td>
         </tr>
         {% endfor %}
     </tbody>

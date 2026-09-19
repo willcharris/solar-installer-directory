@@ -330,7 +330,7 @@ def main():
 
         template = env.get_template("state.html")
         html = template.render(
-            root="", state_name=meta["name"], framing=meta["framing"],
+            root="", state_name=meta["name"], state_slug=slug, framing=meta["framing"],
             source_name=meta["source_name"], retrieved_date=today, rows=rows,
         )
         (out_dir / f"{slug}.html").write_text(html, encoding="utf-8")
