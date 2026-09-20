@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://willcharris.github.io/solar-installer-directory/sitemap.xml

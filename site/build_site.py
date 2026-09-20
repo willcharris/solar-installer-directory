@@ -299,6 +299,29 @@ STATE_LOADERS = {
 }
 
 
+BASE_URL = "https://willcharris.github.io/solar-installer-directory/"
+
+
+def write_sitemap(out_dir: Path, urls: list, today: str):
+    """Every HTML page AND every individual PDF report -- the PDFs are
+    the actual long-tail content this whole SEO strategy depends on, and
+    each one is independently indexable (its own URL, the business name
+    already in the document title). Leaving them out of the sitemap
+    would mean Google has to discover 2,500+ pages by chance instead of
+    being told about them directly."""
+    lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for url in urls:
+        lines.append(f"  <url><loc>{BASE_URL}{url}</loc><lastmod>{today}</lastmod></url>")
+    lines.append("</urlset>")
+    (out_dir / "sitemap.xml").write_text("\n".join(lines), encoding="utf-8")
+    print(f"\nWrote sitemap.xml with {len(urls)} URLs")
+
+    robots_path = out_dir / "robots.txt"
+    if not robots_path.exists():
+        robots_path.write_text(f"User-agent: *\nAllow: /\nSitemap: {BASE_URL}sitemap.xml\n", encoding="utf-8")
+        print("Wrote robots.txt")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--config", required=True, help="JSON file mapping state slug -> data source path(s)")
@@ -315,6 +338,7 @@ def main():
     today = date.today().isoformat()
 
     state_summaries = []
+    sitemap_urls = ["index.html"]
     for slug, meta in STATE_LOADERS.items():
         if slug not in config:
             print(f"  (skipping {slug} -- not in config)")
@@ -327,6 +351,8 @@ def main():
             {"slug": slug, "name": meta["name"], "count": len(rows),
              "complete": meta["complete"], "blurb": meta["blurb"]}
         )
+        sitemap_urls.append(f"{slug}.html")
+        sitemap_urls.extend(row["report_url"] for row in rows if row.get("report_url"))
 
         template = env.get_template("state.html")
         html = template.render(
@@ -340,6 +366,7 @@ def main():
     (out_dir / "index.html").write_text(index_html, encoding="utf-8")
 
     print(f"\nWrote {len(state_summaries) + 1} pages to {out_dir}/")
+    write_sitemap(out_dir, sitemap_urls, today)
 
 
 if __name__ == "__main__":
